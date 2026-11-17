@@ -1,0 +1,2966 @@
+<!DOCTYPE html>
+<html lang="kk" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Компьютер архитектурасы, микропроцессорлар және ОЖ — Интерактивті LMS курс</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            },
+            emeraldStep: {
+              500: '#10b981',
+              600: '#059669',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Плавная прокрутка и кастомные скроллбары */
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.7); }
+
+    @keyframes pulseFlow {
+      0%, 100% { stroke-dashoffset: 24; }
+      50% { stroke-dashoffset: 0; }
+    }
+    .bus-flow {
+      stroke-dasharray: 6 6;
+      animation: pulseFlow 2s linear infinite;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #certificate-printable, #certificate-printable * { visibility: visible; }
+      #certificate-printable {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 2rem;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased transition-colors duration-200 selection:bg-brand-500 selection:text-white">
+
+  <!-- Мобильный оверлей для сайдбара -->
+  <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-30 hidden lg:hidden"></div>
+
+  <div class="flex min-h-screen">
+    <!-- Боковая панель навигации (Sidebar) -->
+    <aside id="sidebar" class="fixed lg:sticky top-0 left-0 z-40 h-screen w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+      <!-- Шапка курса -->
+      <div class="p-5 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 dark:bg-brand-900/50 dark:text-brand-100 border border-brand-200 dark:border-brand-700/50">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            LMS Интерактивті курс
+          </span>
+          <button onclick="toggleSidebar(false)" class="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <h1 class="text-base font-extrabold leading-snug text-slate-900 dark:text-white">
+          Компьютер архитектурасы, микропроцессорлар және ОЖ
+        </h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Автор: Э.ғ.к., доцент Сарсенбиева Н.Ф.
+        </p>
+
+        <!-- Прогресс-бар курса -->
+        <div class="mt-4 bg-slate-100 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+          <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
+            <span class="text-slate-600 dark:text-slate-300">Курс прогресі</span>
+            <span id="sidebar-progress-text" class="text-brand-600 dark:text-brand-400">0% (0/10)</span>
+          </div>
+          <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div id="sidebar-progress-bar" class="h-full bg-gradient-to-r from-brand-600 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+            <span>Жинаған ұпай: <strong id="sidebar-score" class="text-slate-800 dark:text-slate-200">0</strong></span>
+            <button onclick="resetProgressModal()" class="text-rose-500 hover:underline">Қалпына келтіру</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Список 10 уроков -->
+      <nav id="lesson-nav-list" class="flex-1 overflow-y-auto p-3 space-y-1.5">
+        <!-- Заполняется через JS -->
+      </nav>
+
+      <!-- Итоговый экзамен и сертификат -->
+      <div class="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90">
+        <button onclick="openExamView()" id="btn-exam-nav" class="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white shadow-md shadow-brand-500/20 transition-all text-left">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-lg bg-white/15">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            </div>
+            <div>
+              <div class="text-xs font-bold">Қорытынды емтихан</div>
+              <div class="text-[11px] text-indigo-100">15 сұрақ және Сертификат</div>
+            </div>
+          </div>
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Основная область контента -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Верхняя панель (Header) -->
+      <header class="sticky top-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <button onclick="toggleSidebar(true)" class="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="min-w-0">
+            <div id="header-breadcrumb" class="text-xs font-medium text-brand-600 dark:text-brand-400 truncate">
+              1-модуль • 10 сабақтық бағдарлама
+            </div>
+            <h2 id="header-lesson-title" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+              Сабақ 1: Микропроцессор түсінігі, түрлері және архитектуралары
+            </h2>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Кнопка быстрого перехода к экзамену -->
+          <button onclick="openExamView()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Емтихан / Сертификат</span>
+          </button>
+
+          <!-- Переключатель темы -->
+          <button onclick="toggleTheme()" title="Тақырыпты ауыстыру (Жарық / Қараңғы)" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            <svg id="icon-sun" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <svg id="icon-moon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Панель шагов урока (Stepik-стиль) -->
+      <div id="lesson-steps-bar" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3">
+        <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="switchStep(0)" id="step-tab-0" class="step-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold">1</span>
+              <span>Теория және конспект</span>
+            </button>
+            <button onclick="switchStep(1)" id="step-tab-1" class="step-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold">2</span>
+              <span>Интерактивті схемалар мен кестелер</span>
+            </button>
+            <button onclick="switchStep(2)" id="step-tab-2" class="step-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold">3</span>
+              <span>Өзін-өзі тексеру тесті</span>
+            </button>
+          </div>
+          <div id="lesson-status-badge" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            Мәртебесі: Оқылуда
+          </div>
+        </div>
+      </div>
+
+      <!-- Контейнер основного содержимого -->
+      <main id="main-content" class="flex-1 px-4 sm:px-8 py-6 sm:py-8 max-w-5xl w-full mx-auto">
+        <!-- Динамический рендер текущего урока или экзамена -->
+      </main>
+
+      <!-- Нижняя навигация между шагами и уроками -->
+      <footer id="lesson-footer" class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-8 py-4">
+        <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
+          <button onclick="navigatePrev()" id="btn-prev" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span>Алдыңғы қадам</span>
+          </button>
+
+          <div class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block text-center">
+            «Компьютер архитектурасы, микропроцессорлар және операциялық жүйелер» • Сарсенбиева Н.Ф.
+          </div>
+
+          <button onclick="navigateNext()" id="btn-next" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-sm transition-colors">
+            <span>Келесі қадам</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Кастомное модальное окно (без alert/confirm) -->
+  <div id="custom-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <h3 id="modal-title" class="text-lg font-bold text-slate-900 dark:text-white mb-2">Хабарлама</h3>
+      <p id="modal-body" class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed"></p>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeModal()" id="modal-cancel-btn" class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Бас тарту</button>
+        <button id="modal-confirm-btn" class="px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white">Растау</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // БАЗА ДАННЫХ ВСЕХ 10 УРОКОВ КУРСА (НА КАЗАХСКОМ ЯЗЫКЕ)
+    // =========================================================================
+    const COURSE_LESSONS = [
+      {
+        id: 1,
+        shortTitle: "Микропроцессор түсінігі және архитектуралары",
+        title: "Сабақ 1: Микропроцессор түсінігі, түрлері және архитектуралары",
+        duration: "25 мин",
+        summary: "Микропроцессордың құрылымы, негізгі типтері (CPU, MCU, MPU, DSP, GPU), командалар жиынтығы (CISC, RISC, VLIW), SoC, көпядролық жүйелер, жартылай өткізгіштік технологиялар (PMOS, NMOS, CMOS) және қызу мәселесін шешу жолдары.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-gradient-to-br from-brand-50 to-indigo-50/60 dark:from-brand-950/40 dark:to-slate-900 border border-brand-200/80 dark:border-brand-800/50 rounded-2xl p-6">
+              <h3 class="text-lg font-bold text-brand-900 dark:text-brand-100 mb-2">1. Микропроцессор дегеніміз не?</h3>
+              <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                <strong>Микропроцессор (МП)</strong> — бір немесе бірнеше үлкен интегралды схемаларда (ҮИС / VLSI) орналасқан, арифметикалық, логикалық және басқару операцияларын бағдарламалық түрде орындайтын компьютердің орталық есептеуіш құрылғысы. Оның негізгі блоктары: <strong>Арифметикалық-логикалық құрылғы (АЛҚ / ALU)</strong>, <strong>Басқару құрылғысы (БҚ / CU)</strong>, <strong>Регистрлер</strong> және <strong>Кэш-жады (L1, L2, L3)</strong>.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-3">2. Микропроцессорлардың негізгі түрлері</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 mb-2">CPU</span>
+                  <h4 class="font-bold text-sm mb-1">Central Processing Unit</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Әмбебап орталық процессор. Операциялық жүйені, күрделі тармақталған алгоритмдерді және көпміндеттілікті басқарады.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 mb-2">MCU</span>
+                  <h4 class="font-bold text-sm mb-1">Microcontroller Unit</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Микроконтроллер — бір кристалда ядро, RAM, Flash-жады және енгізу-шығару порттары біріктірілген (IoT, тұрмыстық техника).</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 mb-2">MPU</span>
+                  <h4 class="font-bold text-sm mb-1">Microprocessor Unit</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Сыртқы жедел және тұрақты жадыны қажет ететін, жоғары өнімді өнеркәсіптік және есептеу жүйелерінің процессоры.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 mb-2">DSP</span>
+                  <h4 class="font-bold text-sm mb-1">Digital Signal Processor</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Цифрлық сигналдық процессор — нақты уақыт режимінде дыбыс, бейне, радар және байланыс сигналдарын сүзуге маманданған.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300 mb-2">GPU</span>
+                  <h4 class="font-bold text-sm mb-1">Graphics Processing Unit</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Мыңдаған шағын ядролары бар графикалық процессор. 3D-рендеринг пен жасанды интеллект (нейрондық желілер) есептеріне арналған.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300 mb-2">SoC</span>
+                  <h4 class="font-bold text-sm mb-1">System-on-Chip</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Бір кристалдағы жүйе: CPU, GPU, NPU, модем, жады контроллері бір чипке біріктірілген (смартфондар, Apple M-сериясы).</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3 flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+                  Командалар жиынтығы архитектуралары (ISA)
+                </h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li><strong>CISC (Complex Instruction Set Computer):</strong> Күрделі командалар жиынтығы (x86/x64 — Intel, AMD). Бір команда бірнеше төменгі деңгейлі әрекетті орындайды, транзисторлар саны көп.</li>
+                  <li><strong>RISC (Reduced Instruction Set Computer):</strong> Қысқартылған командалар жиынтығы (ARM, RISC-V). Қарапайым, бір тактіде орындалатын командалар, энергия тиімділігі жоғары.</li>
+                  <li><strong>VLIW (Very Long Instruction Word):</strong> Өте ұзын командалық сөз. Бір команда ішінде бірнеше тәуелсіз операциялар қатар кодталып, параллель орындалады.</li>
+                </ul>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3 flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  Жасау технологиялары (PMOS, NMOS, CMOS)
+                </h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li><strong>PMOS:</strong> p-арналы МДП-транзисторларға негізделген алғашқы технология. Жылдамдығы төмен.</li>
+                  <li><strong>NMOS:</strong> n-арналы транзисторлар (электрондар қозғалғыштығы жоғары), PMOS-қа қарағанда 2-3 есе жылдам, бірақ статикалық қуат тұтынуы жоғары.</li>
+                  <li><strong>CMOS (КМОП):</strong> Комплементарлы металл-оксид-жартылай өткізгіш. p- және n-арналы транзисторларды біріктіреді. Тек ауысып-қосылу кезінде ғана энергия тұтынады — заманауи чиптердің негізі.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-5">
+              <h3 class="text-base font-bold text-amber-900 dark:text-amber-200 mb-2">3. Көпядролық жүйелер және Қызу мәселесін шешу жолдары</h3>
+              <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                Тактілік жиілікті 4-5 ГГц-тен асырған кезде қуат тұтыну мен жылу бөліну (TDP) күрт өседі («жиілік қабырғасы»). Сондықтан өндірушілер <strong>көпядролық (Multi-core)</strong> және <strong>гибридті архитектураға</strong> (Performance + Efficiency ядролар) көшті.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-amber-200/70 dark:border-amber-800/40">
+                  <strong>Техпроцесті кішірейту:</strong> 7 нм, 5 нм, 3 нм, 2 нм FinFET және GAAFET транзисторларына көшу.
+                </div>
+                <div class="p-3 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-amber-200/70 dark:border-amber-800/40">
+                  <strong>Динамикалық басқару:</strong> DVFS (кернеу мен жиілікті жүктемеге қарай автоматты реттеу).
+                </div>
+                <div class="p-3 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-amber-200/70 dark:border-amber-800/40">
+                  <strong>Салқындату жүйелері:</strong> Жылу құбырлары, сұйықтықпен (СЖО) және иммерсиялық салқындату.
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">CISC, RISC және VLIW архитектураларының салыстырмалы кестесі</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Сипаттама</th>
+                    <th class="p-3 font-bold text-blue-600 dark:text-blue-400">CISC (x86-64)</th>
+                    <th class="p-3 font-bold text-emerald-600 dark:text-emerald-400">RISC (ARM, RISC-V)</th>
+                    <th class="p-3 font-bold text-purple-600 dark:text-purple-400">VLIW</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-semibold">Командалар ұзындығы</td>
+                    <td class="p-3">Айнымалы (1-ден 15 байтқа дейін)</td>
+                    <td class="p-3">Бекітілген (әдетте 32 бит)</td>
+                    <td class="p-3">Өте ұзын (128–512 бит, бірнеше операция)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Орындалу уақыты</td>
+                    <td class="p-3">Бірнеше такт (микрокод арқылы)</td>
+                    <td class="p-3">Көпшілігі 1 такт ішінде</td>
+                    <td class="p-3">Параллель 1 такт ішінде</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Жадымен жұмыс</td>
+                    <td class="p-3">Кез келген команда жадыға тікелей жүгіне алады</td>
+                    <td class="p-3">Тек LOAD / STORE командалары арқылы</td>
+                    <td class="p-3">Компилятор арқылы алдын ала жоспарланады</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Энергия тиімділігі</td>
+                    <td class="p-3">Орташа / Жоғары қуат тұтыну</td>
+                    <td class="p-3">Өте жоғары (мобильді құрылғылар)</td>
+                    <td class="p-3">Жоғары (арнайы DSP/медиа чиптер)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Негізгі жүктеме</td>
+                    <td class="p-3">Аппараттық декодер (CPU ішінде)</td>
+                    <td class="p-3">Конвейерлеу (Pipelining)</td>
+                    <td class="p-3">Компилятор (бағдарламалық деңгей)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Интерактивный симулятор энергопотребления и тепловыделения CPU -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-base font-bold mb-1">Интерактивті модель: Процессор жиілігі, ядро саны және жылу бөліну (TDP)</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Жиілік пен ядро санын өзгертіп, өнімділік пен жылу бөлінудің өзара байланысын бақылаңыз ($P \propto C \cdot V^2 \cdot f$).</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div class="space-y-4">
+                  <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                      <span>Тактілік жиілік (Frequency):</span>
+                      <span id="cpu-freq-val" class="text-brand-600 font-mono">3.2 ГГц</span>
+                    </div>
+                    <input type="range" id="cpu-freq-slider" min="1.5" max="5.5" step="0.1" value="3.2" oninput="updateCpuSim()" class="w-full accent-brand-600">
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                      <span>Белсенді ядролар саны:</span>
+                      <span id="cpu-cores-val" class="text-emerald-600 font-mono">8 ядро</span>
+                    </div>
+                    <input type="range" id="cpu-cores-slider" min="2" max="32" step="2" value="8" oninput="updateCpuSim()" class="w-full accent-emerald-600">
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                      <span>Техпроцесс технологиясы:</span>
+                      <span id="cpu-nm-val" class="text-purple-600 font-mono">5 нм (CMOS FinFET)</span>
+                    </div>
+                    <select id="cpu-nm-select" onchange="updateCpuSim()" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                      <option value="1.35">14 нм (Ескірген техпроцесс)</option>
+                      <option value="1.0">7 нм (Стандартты)</option>
+                      <option value="0.82" selected>5 нм (Заманауи FinFET)</option>
+                      <option value="0.68">3 нм (Жоғары тиімді GAAFET)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-500">Есептік өнімділік:</span>
+                    <span id="cpu-perf-out" class="text-lg font-extrabold text-brand-600 dark:text-brand-400 font-mono">25.6 GOPS</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-500">Болжамды жылу бөліну (TDP):</span>
+                    <span id="cpu-tdp-out" class="text-lg font-extrabold text-rose-600 dark:text-rose-400 font-mono">68 Вт</span>
+                  </div>
+                  <div id="cpu-cooling-advice" class="text-xs p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                    Ұсынылатын салқындату: Стандартты ауа кулері жеткілікті.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Бір кристалда CPU, GPU, NPU, жедел жады контроллері және байланыс модульдерін біріктіретін архитектура қалай аталады?",
+            options: ["CISC", "SoC (System-on-Chip)", "PMOS", "VLIW"],
+            correct: 1,
+            explanation: "SoC (System-on-Chip — бір кристалдағы жүйе) барлық негізгі есептеуіш және перифериялық контроллерлерді біртұтас чипке біріктіреді."
+          },
+          {
+            q: "Қазіргі заманғы микропроцессорларда статикалық қуат тұтынуды барынша азайтатын негізгі жартылай өткізгіштік технология қайсы?",
+            options: ["PMOS", "NMOS", "CMOS (КМОП)", "Вакуумдық шамдар"],
+            correct: 2,
+            explanation: "CMOS (Complementary Metal-Oxide-Semiconductor) p- және n-арналы транзисторларды қатар қолданады және тек логикалық күй ауысқан сәтте ғана ток тұтынады."
+          },
+          {
+            q: "RISC архитектурасының CISC-тен басты айырмашылығы неде?",
+            options: [
+              "Командалар ұзындығы бекітілген, қарапайым және көбінесе 1 тактіде орындалады",
+              "Тек серверлерде ғана қолданылады",
+              "Жадыға кез келген арифметикалық команда тікелей қатынайды",
+              "Кэш-жады мүлдем болмайды"
+            ],
+            correct: 0,
+            explanation: "RISC (Reduced Instruction Set Computer) қарапайым, бекітілген ұзындықтағы командаларды конвейерлеу арқылы 1 тактіде орындауға негізделген."
+          },
+          {
+            q: "Нақты уақыт режимінде дыбыс, бейне және радар сигналдарын цифрлық сүзуге маманданған процессор түрі:",
+            options: ["GPU", "DSP (Digital Signal Processor)", "MCU", "ALU"],
+            correct: 1,
+            explanation: "DSP (Цифрлық сигналдық процессор) үздіксіз ағынды сигналдарды математикалық өңдеуге арналған."
+          },
+          {
+            q: "Процессордың тактілік жиілігін шексіз арттыруға не кедергі келтіреді?",
+            options: [
+              "Монитор ажыратымдылығының жеткіліксіздігі",
+              "Қуат тұтыну мен жылу бөлінудің (TDP) күрт өсуі",
+              "Қатты диск көлемінің аздығы",
+              "Пернетақта контроллерінің баяулығы"
+            ],
+            correct: 1,
+            explanation: "Жиілік пен кернеу өскен сайын бөлінетін жылу квадраттық/кубтық заңдылықпен артады, бұл кристалдың қызып кетуіне әкеледі."
+          }
+        ]
+      },
+      {
+        id: 2,
+        shortTitle: "Өндірістік салалар, чипсеттер және болашақ",
+        title: "Сабақ 2: Микропроцессорлардың өндірістік салалары, чипсеттер және болашағы",
+        duration: "25 мин",
+        summary: "Микропроцессорлардың 6 негізгі қолданыс саласы, жартылай өткізгіштік өндіріс модельдері (TSMC Foundry, Intel IDM, NVIDIA Fabless), Солтүстік және Оңтүстік көпірлер, чипсет кластары (A/B/Z-X) және болашақ технологиялар (графен, кванттық, нейроморфты, 3D, ДНҚ-компьютерлер).",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Микропроцессорлардың 6 негізгі қолданыс саласы</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700">
+                  <div class="font-bold text-brand-600 dark:text-brand-400 mb-1">1. Есептеу техникасы және серверлер</div>
+                  <p class="text-slate-600 dark:text-slate-300 text-xs">Дербес компьютерлер, ноутбуктер, бұлттық дата-орталықтар және суперкомпьютерлер.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700">
+                  <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1">2. Мобильді және киілетін құрылғылар</div>
+                  <p class="text-slate-600 dark:text-slate-300 text-xs">Смартфондар, планшеттер, смарт-сағаттар (энергия тиімді ARM SoC чиптері).</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700">
+                  <div class="font-bold text-amber-600 dark:text-amber-400 mb-1">3. Автомобиль өнеркәсібі</div>
+                  <p class="text-slate-600 dark:text-slate-300 text-xs">Қозғалтқышты басқару блоктары (ECU), ADAS автопилот жүйелері, электромобильдер.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700">
+                  <div class="font-bold text-purple-600 dark:text-purple-400 mb-1">4. Өнеркәсіптік автоматтандыру (IoT)</div>
+                  <p class="text-slate-600 dark:text-slate-300 text-xs">Өндірістік роботтар, ПЛК (PLC), ақылды үй сенсорлары мен есептегіштер.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700">
+                  <div class="font-bold text-rose-600 dark:text-rose-400 mb-1">5. Медициналық аппаратура</div>
+                  <p class="text-slate-600 dark:text-slate-300 text-xs">МРТ, КТ томографтары, кардиостимуляторлар, портативті диагностикалық құралдар.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700">
+                  <div class="font-bold text-cyan-600 dark:text-cyan-400 mb-1">6. Ғарыш, қорғаныс және телекоммуникация</div>
+                  <p class="text-slate-600 dark:text-slate-300 text-xs">Радиацияға төзімді спутниктік чиптер, 5G/6G базалық станциялары, маршрутизаторлар.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">2. Чипсет архитектурасы: Солтүстік және Оңтүстік көпірлер</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <strong>Чипсет (Жүйелік логика жиынтығы)</strong> — аналық платадағы процессор мен барлық ішкі/сыртқы құрылғылардың өзара әрекеттесуін қамтамасыз ететін микросхемалар кешені.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50">
+                  <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-200 mb-1">Солтүстік көпір (Northbridge / MCH)</h4>
+                  <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                    Жоғары жылдамдықты құрылғыларды байланыстырады: <strong>CPU, жедел жады (RAM) және бейнекарта (PCIe x16)</strong>. Қазіргі процессорларда Солтүстік көпір функциялары (жады контроллері және негізгі PCIe желілері) тікелей CPU кристалының ішіне біріктірілген.
+                  </p>
+                </div>
+                <div class="p-4 rounded-xl bg-teal-50/70 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800/50">
+                  <h4 class="font-bold text-sm text-teal-900 dark:text-teal-200 mb-1">Оңтүстік көпір (Southbridge / PCH)</h4>
+                  <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                    Баяуырақ перифериялық интерфейстерге жауап береді: <strong>SATA, USB порттары, дыбыс кодегі, желілік адаптер (Ethernet/Wi-Fi), BIOS/UEFI</strong>. Қазіргі аналық платалардағы жалғыз чипсет микросхемасы дәл осы PCH (Platform Controller Hub) рөлін атқарады.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">3. Болашақ микропроцессорлық технологиялар</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="p-3.5 rounded-xl bg-white/10 border border-white/15">
+                  <div class="font-bold text-cyan-300 mb-1">Графендік транзисторлар</div>
+                  <p class="text-slate-200">Кремнийді алмастыратын 1 атом қалыңдығындағы көміртек қабаты — жүздеген ГГц жиілікке жетуге мүмкіндік береді.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/10 border border-white/15">
+                  <div class="font-bold text-purple-300 mb-1">Кванттық процессорлар (QPU)</div>
+                  <p class="text-slate-200">Бит орнына <strong>кубиттерді</strong> (суперпозиция және шатасу күйлері) қолданып, криптография мен молекулалық модельдеуді шешеді.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/10 border border-white/15">
+                  <div class="font-bold text-emerald-300 mb-1">Нейроморфты чиптер</div>
+                  <p class="text-slate-200">Адам миының нейрондары мен синапстарының құрылымын қайталайтын (Intel Loihi, IBM TrueNorth) өте үнемді ЖИ чиптері.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/10 border border-white/15">
+                  <div class="font-bold text-amber-300 mb-1">3D-чиптер (Чиплеттік жинақтау)</div>
+                  <p class="text-slate-200">Кристалдарды вертикаль қабаттап орналастыру (TSV технологиясы арқылы) — байланыс жолын қысқартады.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/10 border border-white/15 sm:col-span-2">
+                  <div class="font-bold text-rose-300 mb-1">ДНҚ-компьютерлер</div>
+                  <p class="text-slate-200">Ақпаратты сақтау мен параллель есептеу үшін биохимиялық ДНҚ молекулаларын қолданатын ультра-тығыз есептеу жүйелері.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <!-- Таблица сравнения бизнес-моделей производства чипов -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Жартылай өткізгіштік өндіріс модельдері: TSMC, Intel, NVIDIA</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Компания</th>
+                    <th class="p-3 font-bold">Өндіріс моделі</th>
+                    <th class="p-3 font-bold">Негізгі қызметі</th>
+                    <th class="p-3 font-bold">Артықшылығы мен ерекшелігі</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-bold text-rose-600 dark:text-rose-400">TSMC</td>
+                    <td class="p-3 font-mono text-xs">Pure-Play Foundry</td>
+                    <td class="p-3">Тек тапсырыс бойынша чиптерді басып шығару (Apple, AMD, NVIDIA үшін)</td>
+                    <td class="p-3">Өз брендімен процессор сатпайды, ең озық EUV литография (3нм/2нм) көшбасшысы</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-bold text-blue-600 dark:text-blue-400">Intel</td>
+                    <td class="p-3 font-mono text-xs">IDM (Integrated Device Manufacturer)</td>
+                    <td class="p-3">Чип архитектурасын өзі жобалайды және өз зауыттарында өндіреді</td>
+                    <td class="p-3">Толық циклді бақылау, соңғы жылдары Intel Foundry қызметін де дамытуда</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">NVIDIA</td>
+                    <td class="p-3 font-mono text-xs">Fabless (Зауытсыз)</td>
+                    <td class="p-3">Тек архитектура мен бағдарламалық экожүйені (CUDA) жобалайды</td>
+                    <td class="p-3">Зауыт салуға миллиардтаған шығын жұмсамайды, өндірісті TSMC/Samsung-қа береді</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Таблица классов чипсетов A / B / Z-X -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Аналық плата чипсеттерінің кластары (A / B / Z–X сериялары)</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Класс</th>
+                    <th class="p-3 font-bold">Мысалдар (Intel / AMD)</th>
+                    <th class="p-3 font-bold">Мақсатты сегмент</th>
+                    <th class="p-3 font-bold">Оверклокинг және PCIe желілері</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-bold text-slate-600 dark:text-slate-300">A / H (Бастапқы)</td>
+                    <td class="p-3 font-mono text-xs">H610 / A620</td>
+                    <td class="p-3">Кеңселік және оқу компьютерлері</td>
+                    <td class="p-3">CPU/RAM үдету шектеулі, USB және M.2 слоттар саны минималды</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-bold text-brand-600 dark:text-brand-400">B (Орташа/Оңтайлы)</td>
+                    <td class="p-3 font-mono text-xs">B760 / B650</td>
+                    <td class="p-3">Ойын және әмбебап жұмыс жүйелері</td>
+                    <td class="p-3">RAM үдету (XMP/EXPO) бар, баға мен сапаның ең тиімді теңгерімі</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-bold text-amber-600 dark:text-amber-400">Z / X (Флагмандық)</td>
+                    <td class="p-3 font-mono text-xs">Z790 / X670E</td>
+                    <td class="p-3">Энтузиастар, жұмыс станциялары</td>
+                    <td class="p-3">CPU + RAM толық оверклокинг, максималды PCIe 5.0 желілері мен қуат фазалары</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Чиптерді өз зауытынсыз тек жобалайтын компаниялардың (мысалы, NVIDIA, Qualcomm) бизнес-моделі қалай аталады?",
+            options: ["Foundry", "Fabless", "IDM", "OEM"],
+            correct: 1,
+            explanation: "Fabless (fabrication-less) — жеке кремний зауыттары жоқ, тек микросхема дизайны мен архитектурасын әзірлейтін компаниялар."
+          },
+          {
+            q: "Дәстүрлі чипсет архитектурасында жедел жады (RAM) мен бейнекартаны процессормен байланыстыратын бөлік:",
+            options: ["Оңтүстік көпір (Southbridge)", "Солтүстік көпір (Northbridge)", "BIOS батареясы", "SATA контроллері"],
+            correct: 1,
+            explanation: "Солтүстік көпір ең жоғары жылдамдықты шиналарға (CPU, RAM, PCIe бейнекарта) жауап берді."
+          },
+          {
+            q: "Аналық платалардағы 'B' класты чипсеттердің (мысалы, B650, B760) басты ерекшелігі неде?",
+            options: [
+              "Тек серверлерде қолданылады",
+              "Жедел жадыны үдетуді қолдайды және баға/мүмкіндік бойынша ең оңтайлы орта сегмент",
+              "Бейнекарта қосуға болмайды",
+              "Тек 1 USB порты бар"
+            ],
+            correct: 1,
+            explanation: "B-сериялы чипсеттер кеңселік H/A серияларынан әлдеқайда функционалды, XMP/EXPO қолдайды және көпшілік пайдаланушылар үшін оңтайлы."
+          },
+          {
+            q: "Адам миының нейрондары мен синапстарының жұмыс принципіне негізделген болашақ процессор түрі:",
+            options: ["Нейроморфты чиптер", "CISC процессорлар", "PMOS микросхемалар", "SATA контроллерлер"],
+            correct: 0,
+            explanation: "Нейроморфты чиптер (мысалы, Intel Loihi) жады мен есептеуді біріктіріп, спайктық нейрондық желілерді өте аз энергиямен орындайды."
+          },
+          {
+            q: "TSMC компаниясы жартылай өткізгіштер нарығында қандай рөл атқарады?",
+            options: [
+              "Операциялық жүйелер жазады",
+              "Әлемдегі ең ірі келісімшарттық чип өндіруші (Foundry)",
+              "Тек қатты дискілер шығарады",
+              "Монитор матрицаларын жасайды"
+            ],
+            correct: 1,
+            explanation: "TSMC — Pure-Play Foundry моделі бойынша жұмыс істейтін әлемдегі №1 келісімшарттық микросхема өндіруші зауыт."
+          }
+        ]
+      },
+      {
+        id: 3,
+        shortTitle: "Компьютер архитектурасы және шиналарды модельдеу",
+        title: "Сабақ 3: Компьютер архитектурасы және шиналардың түрлері мен модельдеу",
+        duration: "30 мин",
+        summary: "Жүйелік шина құрылымы (Data Bus, Address Bus, Control Bus), заманауи интерфейстер (PCIe, SATA, USB), топологиялар (Star, Bus, Ring), шиналарды модельдеудің 3 деңгейі (жүйелік, логикалық VHDL/Verilog, физикалық Eye Diagram және Максвелл теңдеулері), оптикалық және кванттық шиналар.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Жүйелік шинаның 3 негізгі арнасы</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                <strong>Шина (Bus)</strong> — компьютердің функционалдық блоктары (CPU, жады, енгізу-шығару құрылғылары) арасында ақпарат пен басқару сигналдарын тасымалдайтын ортақ өткізгіштер жүйесі.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50">
+                  <div class="font-bold text-blue-700 dark:text-blue-300 text-sm mb-1">Деректер шинасы (Data Bus)</div>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">Екі бағытты (біреуінен екіншісіне деректерді оқу/жазу). Ені (32, 64, 128 бит) бір тактіде берілетін ақпарат көлемін анықтайды.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
+                  <div class="font-bold text-emerald-700 dark:text-emerald-300 text-sm mb-1">Адрестік шина (Address Bus)</div>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">Бір бағытты (CPU-дан жадыға/порттарға). Ені $N$ бит болса, тікелей адрестелетін жады көлемі $2^N$ байтқа тең (мысалы, 32-бит = 4 ГБ).</p>
+                </div>
+                <div class="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
+                  <div class="font-bold text-amber-700 dark:text-amber-300 text-sm mb-1">Басқару шинасы (Control Bus)</div>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">Оқу (RD), Жазу (WR), Үзіліс (IRQ), Тактілік импульс (CLK) және шинаны сұрау сигналдарын тасымалдайды.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3">2. Шина топологиялары</h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li><strong>Ортақ шина (Bus):</strong> Барлық құрылғылар бір магистральға қосылады. Қарапайым, бірақ бір уақытта тек 1 таратушы жұмыс істей алады (арбитраж қажет).</li>
+                  <li><strong>Жұлдыз (Star / Point-to-Point):</strong> Әр құрылғы коммутаторға/контроллерге жеке желімен қосылады (мысалы, PCI Express). Коллизия жоқ, жылдамдығы өте жоғары.</li>
+                  <li><strong>Сақина (Ring):</strong> Деректер түйіннен түйінге тұйық контур бойымен беріледі (мысалы, Intel көпядролық процессорларындағы Ring Bus).</li>
+                </ul>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3">3. Шиналарды модельдеудің 3 деңгейі</h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li><strong>1) Жүйелік деңгей (System-level):</strong> Өткізу қабілетін, кідірістерді (latency) және кезектерді SystemC, GEM5 симуляторларында талдау.</li>
+                  <li><strong>2) Логикалық (RTL) деңгей:</strong> Шина хаттамалары мен арбитр логикасын <strong>VHDL / Verilog</strong> тілдерінде сипаттау және верификациялау.</li>
+                  <li><strong>3) Физикалық деңгей (Signal Integrity):</strong> Жоғары жиіліктегі электромагниттік кедергілерді (Crosstalk), шағылысуды <strong>Максвелл теңдеулері</strong> және <strong>Eye Diagram (Көз диаграммасы)</strong> арқылы зерттеу.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 border border-slate-800">
+              <h3 class="text-base font-bold text-indigo-300 mb-3">4. Болашақ шиналық технологиялар</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                  <div class="font-bold text-cyan-400 mb-1">Оптикалық шиналар</div>
+                  <p class="text-slate-300">Мыс сымдардың орнына фотондарды (кремний фотоникасы) қолдану — жылу бөлінбейді, өткізу қабілеті терабиттік.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                  <div class="font-bold text-emerald-400 mb-1">NoC (Network-on-Chip)</div>
+                  <p class="text-slate-300">Кристалл ішіндегі ондаған ядроларды пакеттік маршрутизаторлар желісі арқылы байланыстыру.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                  <div class="font-bold text-amber-400 mb-1">ЖИ-оңтайландыру</div>
+                  <p class="text-slate-300">Трафик жүктемесін алдын ала болжап, шина өткізгіштігін динамикалық үлестіретін нейро-арбитрлер.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+                  <div class="font-bold text-purple-400 mb-1">Кванттық және нейроморфты</div>
+                  <p class="text-slate-300">Кубиттер арасындағы резонаторлық шиналар және оқиғаға негізделген AER (Address-Event Representation).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <!-- SVG Схема системной шины -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <h3 class="text-base font-bold">Интерактивті схема: Жүйелік шина архитектурасы</h3>
+                <div class="flex gap-2">
+                  <button onclick="highlightBus('all')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-brand-100">Барлығы</button>
+                  <button onclick="highlightBus('data')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Data Bus</button>
+                  <button onclick="highlightBus('addr')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">Address Bus</button>
+                  <button onclick="highlightBus('ctrl')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Control Bus</button>
+                </div>
+              </div>
+              <div class="w-full overflow-x-auto">
+                <svg viewBox="0 0 760 270" class="w-full min-w-[600px] h-auto select-none">
+                  <!-- Устройства сверху -->
+                  <rect x="40" y="18" width="180" height="68" rx="14" fill="#4f46e5" />
+                  <text x="130" y="48" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">CPU (Процессор)</text>
+                  <text x="130" y="68" text-anchor="middle" fill="#e0e7ff" font-size="11">ALU • CU • Регистрлер</text>
+
+                  <rect x="290" y="18" width="180" height="68" rx="14" fill="#0f766e" />
+                  <text x="380" y="48" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">RAM / ROM (Жады)</text>
+                  <text x="380" y="68" text-anchor="middle" fill="#ccfbf1" font-size="11">Жедел және тұрақты жады</text>
+
+                  <rect x="540" y="18" width="180" height="68" rx="14" fill="#b45309" />
+                  <text x="630" y="48" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">I/O Контроллерлер</text>
+                  <text x="630" y="68" text-anchor="middle" fill="#fef3c7" font-size="11">PCIe • NVMe • USB • NIC</text>
+
+                  <!-- Линии Data Bus -->
+                  <g id="svg-bus-data" class="transition-opacity duration-300">
+                    <line x1="40" y1="145" x2="720" y2="145" stroke="#3b82f6" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="100" y1="86" x2="100" y2="145" stroke="#3b82f6" stroke-width="3" class="bus-flow"/>
+                    <line x1="350" y1="86" x2="350" y2="145" stroke="#3b82f6" stroke-width="3" class="bus-flow"/>
+                    <line x1="600" y1="86" x2="600" y2="145" stroke="#3b82f6" stroke-width="3" class="bus-flow"/>
+                    <text x="725" y="149" fill="#3b82f6" font-weight="bold" font-size="11">Data (↔)</text>
+                  </g>
+
+                  <!-- Линии Address Bus -->
+                  <g id="svg-bus-addr" class="transition-opacity duration-300">
+                    <line x1="40" y1="185" x2="720" y2="185" stroke="#10b981" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="130" y1="86" x2="130" y2="185" stroke="#10b981" stroke-width="3" class="bus-flow"/>
+                    <line x1="380" y1="86" x2="380" y2="185" stroke="#10b981" stroke-width="3" class="bus-flow"/>
+                    <line x1="630" y1="86" x2="630" y2="185" stroke="#10b981" stroke-width="3" class="bus-flow"/>
+                    <text x="725" y="189" fill="#10b981" font-weight="bold" font-size="11">Addr (→)</text>
+                  </g>
+
+                  <!-- Линии Control Bus -->
+                  <g id="svg-bus-ctrl" class="transition-opacity duration-300">
+                    <line x1="40" y1="225" x2="720" y2="225" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="160" y1="86" x2="160" y2="225" stroke="#f59e0b" stroke-width="3" class="bus-flow"/>
+                    <line x1="410" y1="86" x2="410" y2="225" stroke="#f59e0b" stroke-width="3" class="bus-flow"/>
+                    <line x1="660" y1="86" x2="660" y2="225" stroke="#f59e0b" stroke-width="3" class="bus-flow"/>
+                    <text x="725" y="229" fill="#f59e0b" font-weight="bold" font-size="11">Ctrl (↔)</text>
+                  </g>
+                </svg>
+              </div>
+              <p id="bus-desc-box" class="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/70 p-3 rounded-xl mt-2">
+                Барлық 3 шина бірге жүйелік магистральды құрайды. Кез келген батырманы басып, нақты шинаның жұмысын бөлек қараңыз.
+              </p>
+            </div>
+
+            <!-- Таблица современных шин PCIe, SATA, USB -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Заманауи перифериялық шиналар мен интерфейстер</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Шина / Интерфейс</th>
+                    <th class="p-3 font-bold">Топология</th>
+                    <th class="p-3 font-bold">Өткізу қабілеті</th>
+                    <th class="p-3 font-bold">Қолданылу саласы</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-bold text-brand-600">PCI Express (PCIe 4.0 / 5.0)</td>
+                    <td class="p-3">Point-to-Point (Жұлдыз/Арналар x1..x16)</td>
+                    <td class="p-3 font-mono text-xs">PCIe 5.0 x16 ≈ 64 ГБ/с (бір бағытта)</td>
+                    <td class="p-3">Бейнекарталар (GPU), жылдам NVMe SSD жинақтауыштар</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-bold text-emerald-600">SATA III (6 Гбит/с)</td>
+                    <td class="p-3">Point-to-Point (Тізбекті)</td>
+                    <td class="p-3 font-mono text-xs">~600 МБ/с дейін</td>
+                    <td class="p-3">2.5"/3.5" HDD және классикалық SSD дискілер</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-bold text-amber-600">USB 3.2 / USB4 (Thunderbolt)</td>
+                    <td class="p-3">Көп деңгейлі жұлдыз (Hub-тар арқылы)</td>
+                    <td class="p-3 font-mono text-xs">5 – 40 Гбит/с (USB4)</td>
+                    <td class="p-3">Әмбебап сыртқы құрылғылар, флешкалар, док-станциялар</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Егер компьютердің адрестік шинасының ені 32 бит болса, ол тікелей қанша көлемдегі жедел жадыны адрестей алады?",
+            options: ["2 ГБ", "4 ГБ (2³² байт)", "16 ГБ", "64 ТБ"],
+            correct: 1,
+            explanation: "2³² = 4 294 967 296 байт = 4 Гигабайт. Сондықтан 32-биттік ОЖ-лер 4 ГБ-тан артық RAM көре алмайды."
+          },
+          {
+            q: "Шиналарды физикалық деңгейде модельдеу кезінде сигнал сапасын бағалау үшін қандай диаграмма қолданылады?",
+            options: ["Гант диаграммасы", "Eye Diagram (Көз диаграммасы)", "Венн диаграммасы", "Дөңгелек диаграмма"],
+            correct: 1,
+            explanation: "Eye Diagram (Көз диаграммасы) осциллографта сигналдарды қабаттастырып, джиттер мен шу деңгейін (Signal Integrity) бағалауға мүмкіндік береді."
+          },
+          {
+            q: "Логикалық (RTL) деңгейде шина хаттамаларын сипаттау үшін қандай аппараттық сипаттау тілдері қолданылады?",
+            options: ["HTML және CSS", "VHDL және Verilog", "SQL және PHP", "Bash және PowerShell"],
+            correct: 1,
+            explanation: "VHDL және Verilog — цифрлық схемалар мен шина контроллерлерін жобалауға арналған стандартты HDL тілдері."
+          },
+          {
+            q: "Кристалл ішіндегі ондаған процессорлық ядроларды пакеттік маршрутизаторлар желісі арқылы біріктіретін архитектура:",
+            options: ["SATA", "NoC (Network-on-Chip)", "ISA", "AGP"],
+            correct: 1,
+            explanation: "NoC (Кристалдағы желі) көпядролық процессорларда дәстүрлі ортақ шинаның кептелісін жою үшін қолданылады."
+          },
+          {
+            q: "Төмендегі шиналардың қайсысы тек бір бағытты (процессордан жадыға/құрылғыларға қарай) болып табылады?",
+            options: ["Деректер шинасы (Data Bus)", "Адрестік шина (Address Bus)", "Басқару шинасы (Control Bus)", "USB шинасы"],
+            correct: 1,
+            explanation: "Жады ұяшығының немесе порттың адресін әрқашан процессор (немесе DMA контроллері) береді, сондықтан адрестік шина бір бағытты."
+          }
+        ]
+      },
+      {
+        id: 4,
+        shortTitle: "Шиналық архитектура, буферизация және адаптерлер",
+        title: "Сабақ 4: Сандық құрылғылардың шиналық архитектурасы, буферизация және адаптерлер",
+        duration: "25 мин",
+        summary: "Шиналық архитектураның артықшылықтары, буферизациялау принципі (FIFO, Ring Buffer) және болашағы, сыртқы құрылғы адаптерлері мен кеңейту платалары (GPU, NIC, Sound Card), ЖИ-трафик симуляциясы.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Шиналық архитектураның негізгі артықшылықтары</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                Ертедегі компьютерлерде әрбір құрылғы процессорға жеке кабельдермен қосылатын («әркім әркіммен» байланысы). Шиналық архитектураға көшу компьютер жасау индустриясында революция жасады:
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs sm:text-sm">
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <strong class="text-brand-600 dark:text-brand-400">Модульділік және масштабталу:</strong> Жаңа құрылғыны қосу үшін процессордың құрылымын өзгертудің қажеті жоқ — бос шина слотына жалғау жеткілікті.
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <strong class="text-emerald-600 dark:text-emerald-400">Стандарттау:</strong> Әртүрлі өндірушілердің құрылғылары бірыңғай электрлік және логикалық хаттамалар (PCIe, USB) арқылы үйлесімді жұмыс істейді.
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <strong class="text-amber-600 dark:text-amber-400">Өзіндік құнның төмендеуі:</strong> Аналық платадағы мыс жолдар мен ажыратқыштар саны бірнеше есе қысқарады.
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <strong class="text-purple-600 dark:text-purple-400">Жөндеу және жаңарту жеңілдігі:</strong> Істен шыққан кеңейту платасын немесе адаптерді оңай ауыстыруға болады.
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">2. Буферизациялау принципі және оның болашағы</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <strong>Буферизация</strong> — деректерді таратушы мен қабылдаушы құрылғылардың жылдамдық айырмашылығын теңестіру үшін уақытша аралық жадыны (буферді) пайдалану әдісі. Мысалы, CPU секундына гигабайттап дерек жібереді, ал принтер немесе желілік карта оны баяу өңдейді.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50">
+                  <div class="font-bold text-indigo-800 dark:text-indigo-200 mb-1">FIFO буферлері</div>
+                  <p class="text-slate-600 dark:text-slate-300">«Бірінші келген — бірінші шығады» (First-In, First-Out) қағидатымен жұмыс істейтін аппараттық кезектер (UART, USB, PCIe контроллерлерінде).</p>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
+                  <div class="font-bold text-emerald-800 dark:text-emerald-200 mb-1">Қос буферизация (Double Buffering)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Бір буфер экранға шығарылып жатқанда, екінші буферге келесі кадр жазылады (бейнекарталарда экран жыпылықтауын жояды).</p>
+                </div>
+                <div class="p-4 rounded-xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50">
+                  <div class="font-bold text-purple-800 dark:text-purple-200 mb-1">Болашағы: Zero-Copy & Smart Buffers</div>
+                  <p class="text-slate-600 dark:text-slate-300">Деректерді CPU арқылы артық көшірмей тікелей жадыдан құрылғыға жіберу (RDMA, GPUDirect) және ЖИ-басқарылатын адаптивті буферлер.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">3. Сыртқы құрылғы адаптерлері мен кеңейту платалары</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
+                <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-rose-600 dark:text-rose-400 mb-1">GPU (Графикалық адаптер)</div>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">PCIe x16 слотына қосылады. Жеке VRAM бейнежадысы, шейдерлік ядролары және HDMI/DisplayPort шығыстары бар.</p>
+                </div>
+                <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-blue-600 dark:text-blue-400 mb-1">NIC (Желілік адаптер)</div>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">Компьютерді локалды желіге (Ethernet 1/10/100 Гбит/с) немесе сымсыз Wi-Fi желісіне қосады. Бірегей MAC-адресі болады.</p>
+                </div>
+                <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-amber-600 dark:text-amber-400 mb-1">Sound Card (Дыбыс картасы)</div>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">Цифрлық дыбысты аналогтық сигналға (ЦАТ / DAC) және микрофон сигналын цифрлық кодқа (АЦТ / ADC) түрлендіреді.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+            <h3 class="text-base font-bold mb-1">Интерактивті симулятор: FIFO буферизация және ЖИ-трафик жүктемесі</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Деректер келу жылдамдығы мен өңдеу жылдамдығын реттеп, буфердің толуын (Buffer Overflow) немесе тұрақты жұмысын бақылаңыз.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span>Кіріс трафик жылдамдығы (CPU / Желі):</span>
+                    <span id="buf-in-val" class="font-mono text-brand-600">600 МБ/с</span>
+                  </div>
+                  <input type="range" id="buf-in-slider" min="100" max="1200" step="50" value="600" oninput="updateBufferSim()" class="w-full accent-brand-600">
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span>Құрылғының өңдеу жылдамдығы (I/O):</span>
+                    <span id="buf-out-val" class="font-mono text-emerald-600">500 МБ/с</span>
+                  </div>
+                  <input type="range" id="buf-out-slider" min="100" max="1200" step="50" value="500" oninput="updateBufferSim()" class="w-full accent-emerald-600">
+                </div>
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" id="buf-ai-opt" onchange="updateBufferSim()" class="rounded text-brand-600">
+                  <label for="buf-ai-opt" class="text-xs font-semibold">ЖИ-трафик оңтайландыруын (Adaptive Flow Control) қосу</label>
+                </div>
+              </div>
+              <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between text-xs font-bold mb-2">
+                    <span>FIFO Буфер толу деңгейі:</span>
+                    <span id="buf-pct-label" class="font-mono">65%</span>
+                  </div>
+                  <div class="w-full h-5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden p-0.5">
+                    <div id="buf-fill-bar" class="h-full rounded-full bg-amber-500 transition-all duration-300" style="width: 65%"></div>
+                  </div>
+                </div>
+                <p id="buf-status-msg" class="text-xs mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+                  Кіріс ағыны шығыстан сәл жоғары: FIFO буфер уақытша пакеттерді жинақтап, дерек жоғалуының алдын алуда.
+                </p>
+              </div>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Деректерді жіберуші мен қабылдаушы құрылғылардың жылдамдық айырмашылығын теңестіру үшін уақытша жадыны қолдану қалай аталады?",
+            options: ["Фрагментация", "Буферизация", "Архивация", "Клондау"],
+            correct: 1,
+            explanation: "Буферизация (Buffering) жылдам құрылғы мен баяу перифериялық құрылғы арасындағы деректер ағынын тұрақтандырады."
+          },
+          {
+            q: "Дыбыс картасында микрофоннан келетін аналогтық дыбыс толқынын компьютер түсінетін цифрлық кодқа айналдыратын түйін:",
+            options: ["ЦАТ (DAC)", "АЦТ (ADC — Аналогты-цифрлық түрлендіргіш)", "DMA", "BIOS"],
+            correct: 1,
+            explanation: "АЦТ (ADC — Analog-to-Digital Converter) аналогтық сигналды дискретті цифрлық мәндерге түрлендіреді."
+          },
+          {
+            q: "«Бірінші келген дерек — бірінші өңделеді» қағидатымен жұмыс істейтін аппараттық буфер түрі:",
+            options: ["LIFO", "FIFO", "RAID", "BIOS"],
+            correct: 1,
+            explanation: "FIFO (First-In, First-Out) кезек тәртібін сақтайды, бұл деректер пакеттерінің реттілігін бұзбау үшін маңызды."
+          },
+          {
+            q: "Шиналық архитектураның басты артықшылықтарының бірі:",
+            options: [
+              "Модульділік және жаңа құрылғыларды стандартты слоттар арқылы оңай қосу",
+              "Тек бір ғана перифериялық құрылғыны қолдау",
+              "Деректерді тек оптикалық кабельмен беру",
+              "Операциялық жүйені қажет етпеуі"
+            ],
+            correct: 0,
+            explanation: "Шиналық архитектура стандартталған интерфейстер арқылы компьютерді оңай кеңейтуге және жаңартуға мүмкіндік береді."
+          },
+          {
+            q: "Деректерді орталық процессордың (CPU) қатысуынсыз, тікелей жедел жады мен құрылғы арасында тасымалдау механизмі:",
+            options: ["DMA (Direct Memory Access)", "POST", "ASCII", "CLI"],
+            correct: 0,
+            explanation: "DMA (Жадыға тікелей қатынау) CPU-ды күнделікті дерек көшіру жұмысынан босатып, жүйе өнімділігін арттырады."
+          }
+        ]
+      },
+      {
+        id: 5,
+        shortTitle: "Ақпаратты бейнелеу және енгізу құралдары",
+        title: "Сабақ 5: Ақпаратты бейнелеу және енгізу құралдары",
+        duration: "20 мин",
+        summary: "Видеомонитор технологиялары (LCD/IPS/VA, OLED, Mini-LED), пернетақта түрлері (мембраналық, механикалық, сымсыз, эргономикалық, мини), графикалық манипуляторлар, техникалық кемшіліктер, денсаулыққа әсері және 20-20-20 ережесі.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Видеомониторлар және дисплей технологиялары</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <strong>Видеомонитор</strong> — компьютерден шығатын графикалық және мәтіндік ақпаратты визуалды түрде бейнелейтін негізгі шығару құрылғысы. Негізгі параметрлері: диагональ (дюйм), ажыратымдылық (Full HD, 2K, 4K), жаңарту жиілігі (60 Гц – 360 Гц), жауап беру уақыты (мс) және түс қамтуы (sRGB, DCI-P3).
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-blue-600 dark:text-blue-400 mb-1">IPS (In-Plane Switching)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Көру бұрышы 178°, түстерді дәл береді. Дизайн, бағдарламалау және кеңсе жұмысы үшін ең үздік стандарт.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1">VA (Vertical Alignment)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Өте жоғары контраст (3000:1 және одан жоғары), қанық қара түс. Фильм көруге және ойындарға тиімді.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-purple-600 dark:text-purple-400 mb-1">OLED / QD-OLED</div>
+                  <p class="text-slate-600 dark:text-slate-300">Әр пиксель өздігінен жарық шығарады (артқы жарықтандыру жоқ). Мінсіз қара түс және 0.03 мс лездік жауап беру уақыты.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">2. Пернетақта түрлері және Графикалық манипуляторлар</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs mb-5">
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold mb-1">Мембраналық пернетақта</div>
+                  <p class="text-slate-600 dark:text-slate-400">Үш қабатты иілгіш мембранаға негізделген. Арзан, дыбыссыз, бірақ тактильді сезімі жұмсақ және қызмет ету мерзімі шектеулі (~5 млн басу).</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold mb-1">Механикалық пернетақта</div>
+                  <p class="text-slate-600 dark:text-slate-400">Әр перненің астында жеке серіппелі қосқыш (Switch: Linear, Tactile, Clicky) бар. 50–100 млн басуға төзімді, жоғары дәлдік береді.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold mb-1">Сымсыз (Bluetooth / 2.4 ГГц)</div>
+                  <p class="text-slate-600 dark:text-slate-400">Кабельсіз еркіндік береді, аккумулятор немесе батареямен жұмыс істейді.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold mb-1">Эргономикалық (Split)</div>
+                  <p class="text-slate-600 dark:text-slate-400">Білек буынына түсетін жүктемені азайту үшін екі бөлікке бөлінген немесе иілген пішінде жасалған.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold mb-1">Мини-пернетақталар (60% / TKL)</div>
+                  <p class="text-slate-600 dark:text-slate-400">Цифрлық блок (NumPad) алынып тасталған ықшам модельдер — үстелде көп орын үнемдейді.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold mb-1">Графикалық манипуляторлар</div>
+                  <p class="text-slate-600 dark:text-slate-400">Оптикалық/лазерлік тінтуір, трекбол, тачпад, графикалық планшет (стилус), джойстик және 3D-манипуляторлар.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-2xl p-6">
+              <h3 class="text-lg font-bold text-rose-900 dark:text-rose-200 mb-2">3. Денсаулыққа әсері, 20-20-20 ережесі және Қауіпсіздік</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                <div>
+                  <h4 class="font-bold mb-1.5">Медициналық және эргономикалық тәуекелдер:</h4>
+                  <ul class="list-disc pl-5 space-y-1 text-xs">
+                    <li><strong>Компьютерлік көру синдромы (CVS):</strong> Көздің құрғауы, ШИМ (PWM) жыпылықтауынан және көк спектрден шаршауы.</li>
+                    <li><strong>20-20-20 ережесі:</strong> Әрбір <strong>20 минут</strong> сайын, <strong>20 фут</strong> (шамамен 6 метр) қашықтықтағы нысанға кемінде <strong>20 секунд</strong> қарап көзді демалдыру.</li>
+                    <li><strong>Туннельдік синдром:</strong> Білектің дұрыс орналаспауынан жүйке талшықтарының қысылуы.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-bold mb-1.5">Техникалық және ақпараттық қауіпсіздік:</h4>
+                  <ul class="list-disc pl-5 space-y-1 text-xs">
+                    <li><strong>BadUSB шабуылдары:</strong> Қарапайым флешка немесе тінтуір кейпіндегі құрылғы өзін HID-пернетақта ретінде таныстырып, зиянды командалар енгізуі.</li>
+                    <li><strong>Keylogger (Пернелерді тіркеу):</strong> Аппараттық немесе бағдарламалық жолмен құпиясөздерді ұрлау.</li>
+                    <li><strong>Tempest / Ван Эйк сәулеленуі:</strong> Монитор кабелінен тарайтын электромагниттік толқындар арқылы экрандағы бейнені қашықтан ұстау.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+            <h3 class="text-base font-bold mb-2">Интерактивті құрал: «20-20-20» Көз демалысы таймері және Эргономика чек-листі</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Компьютер алдында жұмыс істегенде көздің шаршауын алдын алу үшін таймерді іске қосып көріңіз.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+              <div class="p-5 rounded-2xl bg-gradient-to-br from-brand-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800/60 border border-brand-200 dark:border-slate-700 text-center">
+                <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">20 секундтық көз жаттығуы</div>
+                <div id="eye-timer-display" class="text-4xl font-extrabold font-mono text-brand-600 dark:text-brand-400 my-3">00:20</div>
+                <p id="eye-timer-hint" class="text-xs text-slate-600 dark:text-slate-300 mb-4">6 метр (20 фут) қашықтықтағы терезеге немесе алыс нүктеге қараңыз.</p>
+                <div class="flex justify-center gap-2">
+                  <button onclick="startEyeTimer()" class="px-4 py-2 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white">Бастау (20 сек)</button>
+                  <button onclick="resetEyeTimer()" class="px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-600">Қалпына келтіру</button>
+                </div>
+              </div>
+              <div class="space-y-2.5 text-xs">
+                <div class="font-bold text-sm mb-2">Жұмыс орнының эргономикалық стандарттары:</div>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 cursor-pointer">
+                  <input type="checkbox" checked class="accent-emerald-600">
+                  <span>Монитор көз деңгейінде немесе 10–15° сәл төмен орналасқан</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 cursor-pointer">
+                  <input type="checkbox" checked class="accent-emerald-600">
+                  <span>Көз бен монитор арақашықтығы 50–70 см (созылған қол ұзындығы)</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 cursor-pointer">
+                  <input type="checkbox" class="accent-emerald-600">
+                  <span>Мониторда Flicker-Free (ШИМ-сіз) және Low Blue Light режимі қосулы</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 cursor-pointer">
+                  <input type="checkbox" class="accent-emerald-600">
+                  <span>Шынтақ пен білек 90° бұрышпен үстелге еркін тірелген</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Көздің шаршауын алдын алуға арналған «20-20-20» ережесі нені білдіреді?",
+            options: [
+              "Күніне 20 минут жұмыс істеу",
+              "Әр 20 минут сайын 20 фут (~6 м) қашықтыққа 20 секунд қарау",
+              "Монитор жарықтығын 20%-ға қою",
+              "Пернетақтадан 20 см алшақ отыру"
+            ],
+            correct: 1,
+            explanation: "20-20-20 ережесі көз бұлшықеттерінің аккомодациялық спазмын болдырмау үшін әр 20 минут сайын 6 метр қашықтыққа 20 секунд қарауды ұсынады."
+          },
+          {
+            q: "Қарапайым флешка кейпіндегі құрылғы компьютерге жалғанғанда өзін HID-пернетақта ретінде таныстырып, зиянды командалар енгізетін шабуыл түрі:",
+            options: ["DDoS", "BadUSB", "Phishing", "SQL Injection"],
+            correct: 1,
+            explanation: "BadUSB микроконтроллері қайта бағдарламаланып, операциялық жүйеге пернетақта ретінде көрінеді және лезде командалық жолды іске қоса алады."
+          },
+          {
+            q: "Әр пикселі өздігінен жарық шығаратын және артқы жарықтандыруды (Backlight) қажет етпейтін дисплей матрицасы:",
+            options: ["TN", "IPS", "OLED", "VA"],
+            correct: 2,
+            explanation: "OLED (Organic Light-Emitting Diode) матрицасында әр пиксель тәуелсіз жанады және сөнеді, бұл абсолютті қара түс береді."
+          },
+          {
+            q: "Мембраналық пернетақтамен салыстырғанда механикалық пернетақтаның басты артықшылығы:",
+            options: [
+              "Судың астында жұмыс істей береді",
+              "Әр пернеде жеке серіппелі қосқыш (Switch) бар және 50–100 млн басуға төзімді",
+              "Салмағы 50 грамм ғана",
+              "Батареясыз 10 жыл жұмыс істейді"
+            ],
+            correct: 1,
+            explanation: "Механикалық қосқыштар нақты тактильді кері байланыс, жоғары жылдамдық және өте ұзақ қызмет ету ресурсымен ерекшеленеді."
+          },
+          {
+            q: "Дәл сызбалар мен көркем иллюстрациялар салуға арналған, қысым күшін сезетін стилусы бар енгізу құрылғысы:",
+            options: ["Трекбол", "Графикалық планшет (Дигитайзер)", "Сканер", "Плоттер"],
+            correct: 1,
+            explanation: "Графикалық планшет қаламның (стилустың) көлбеу бұрышы мен басу күшін (8192 деңгейге дейін) дәл тіркейді."
+          }
+        ]
+      },
+      {
+        id: 6,
+        shortTitle: "Серверлер, жұмыс станциялары және модельдеу",
+        title: "Сабақ 6: Серверлер мен жұмыс станциялары және желілік архитектураны модельдеу",
+        duration: "30 мин",
+        summary: "Гипермасштабтау, Hypervisor, Kubernetes/Docker, GSLB, SAN, VDI, SD-WAN, ZTNA, Edge Computing, Tier III/IV дата-орталықтар, Liquid/Immersion Cooling, Server vs Workstation кестесі, Chaos Engineering, Digital Twins, Queueing Theory, 1960–2026 эволюция.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Қазіргі заманғы серверлік инфрақұрылым технологиялары</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-brand-600 dark:text-brand-400 mb-1">Виртуализация және Контейнерлер</div>
+                  <p class="text-slate-600 dark:text-slate-300"><strong>Hypervisor</strong> (VMware ESXi, KVM) бір физикалық серверде бірнеше ВМ іске қосады. <strong>Docker және Kubernetes</strong> микросервистерді жеңіл контейнерлерде оркестрлейді.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1">Гипермасштабтау және GSLB</div>
+                  <p class="text-slate-600 dark:text-slate-300"><strong>Hyperscale</strong> — жүктеме өскенде мыңдаған серверлерді автоматты қосу. <strong>GSLB</strong> (Global Server Load Balancing) пайдаланушы трафигін ең жақын дата-орталыққа бағыттайды.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-purple-600 dark:text-purple-400 mb-1">SAN және VDI</div>
+                  <p class="text-slate-600 dark:text-slate-300"><strong>SAN (Storage Area Network)</strong> — жоғары жылдамдықты деректер сақтау желісі. <strong>VDI</strong> — серверде орналасқан виртуалды жұмыс үстелдері инфрақұрылымы.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                  <div class="font-bold text-amber-600 dark:text-amber-400 mb-1">SD-WAN, ZTNA және Edge Computing</div>
+                  <p class="text-slate-600 dark:text-slate-300"><strong>SD-WAN</strong> — бағдарламалық басқарылатын кең ауқымды желі. <strong>ZTNA</strong> — «Ешкімге сенбе, әрқашан тексер» қауіпсіздік моделі. <strong>Edge</strong> — деректерді көзіне жақын өңдеу.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 sm:col-span-2">
+                  <div class="font-bold text-rose-600 dark:text-rose-400 mb-1">Дата-орталықтар (Tier III/IV) және Салқындату</div>
+                  <p class="text-slate-600 dark:text-slate-300"><strong>Tier III</strong> (99.982% қолжетімділік, резервтелген арналар) және <strong>Tier IV</strong> (99.995%, толық ақауға төзімділік). Жоғары тығыздықты ЖИ-кластерлерде <strong>Liquid Cooling</strong> (сұйықтық) және <strong>Immersion Cooling</strong> (диелектрик сұйықтыққа толық батыру) қолданылады.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">2. Желілік және серверлік архитектураны модельдеу әдістері</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-indigo-600 dark:text-indigo-400 mb-1">Queueing Theory (Кезектер теориясы)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Сұраныстар ағынын (Пуассон ағыны) және сервердің қызмет көрсету уақытын математикалық модельдеу (M/M/1, M/M/c жүйелері).</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1">Discrete Event Simulation (DES)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Дискретті оқиғаларды модельдеу (NS-3, OMNeT++) — желідегі әрбір пакеттің қозғалысы мен кідірісін имитациялау.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-rose-600 dark:text-rose-400 mb-1">Chaos Engineering</div>
+                  <p class="text-slate-600 dark:text-slate-300">Жүйенің төзімділігін тексеру үшін өндірістік ортада әдейі ақаулар тудыру (мысалы, Netflix Chaos Monkey).</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div class="font-bold text-cyan-600 dark:text-cyan-400 mb-1">Digital Twins (Цифрлық егіздер)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Нақты дата-орталықтың жылу, энергия және желілік күйін нақты уақытта қайталайтын виртуалды көшірмесі.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 sm:col-span-2">
+                  <div class="font-bold text-amber-600 dark:text-amber-400 mb-1">AI Predictive Modeling (ЖИ болжамдық модельдеу)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Машиналық оқыту арқылы трафик шыңдарын және жабдықтың істен шығуын алдын ала болжау (Predictive Maintenance).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <!-- Таблица Server vs Workstation -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Сервер (Server) және Жұмыс станциясы (Workstation) салыстырмалы кестесі</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Критерий</th>
+                    <th class="p-3 font-bold text-brand-600 dark:text-brand-400">Сервер (Server)</th>
+                    <th class="p-3 font-bold text-emerald-600 dark:text-emerald-400">Жұмыс станциясы (Workstation)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-semibold">Негізгі мақсаты</td>
+                    <td class="p-3">Көптеген клиенттерге 24/7 режимінде желілік қызмет көрсету, дерекқорлар, бұлт</td>
+                    <td class="p-3">Бір маманның күрделі есептеулері: 3D-рендеринг, CAD, бейнемонтаж, ЖИ оқыту</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Процессорлар (CPU)</td>
+                    <td class="p-3">Көпсокетті (2–8 CPU), 64–192+ ядро (Intel Xeon Scalable, AMD EPYC)</td>
+                    <td class="p-3">1–2 жоғары жиілікті процессор (AMD Threadripper PRO, Intel Xeon W)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Жедел жады (RAM)</td>
+                    <td class="p-3">Үлкен көлем (512 ГБ – 12 ТБ), міндетті түрде <strong>ECC</strong> (қателерді түзету)</td>
+                    <td class="p-3">64 ГБ – 2 ТБ, жоғары жиілікті ECC / Registered DDR5</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Сенімділік және Резервтеу</td>
+                    <td class="p-3">Hot-Swap қуат блоктары, RAID массивтер, IPMI/iLO қашықтан басқару</td>
+                    <td class="p-3">Жоғары сапалы компоненттер, бірақ әдетте 1 қуат блогы</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Форм-фактор және Шу</td>
+                    <td class="p-3">Rack (1U–4U), Blade-серверлер — шуы жоғары, арнайы серверлік бөлмеге арналған</td>
+                    <td class="p-3">Tower (мұнара) корпусы — дыбыссыз жұмыс істейді, кеңсе үстелінің жанына қойылады</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Хронология 1960–2026 -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+              <h3 class="text-base font-bold mb-4">Есептеу және серверлік архитектура эволюциясы (1960–2026)</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-slate-500">
+                  <div class="font-mono font-bold text-slate-500">1960–1970 жж.</div>
+                  <div class="font-bold mt-1">Мэйнфреймдер дәуірі</div>
+                  <p class="text-slate-600 dark:text-slate-400 mt-1">IBM System/360. Орталықтандырылған есептеу және терминалдар.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-blue-500">
+                  <div class="font-mono font-bold text-blue-600">1980–1990 жж.</div>
+                  <div class="font-bold mt-1">Клиент-Сервер және Интернет</div>
+                  <p class="text-slate-600 dark:text-slate-400 mt-1">x86 серверлері, TCP/IP желілері, алғашқы веб-серверлер.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-emerald-500">
+                  <div class="font-mono font-bold text-emerald-600">2000–2015 жж.</div>
+                  <div class="font-bold mt-1">Виртуализация және Бұлт (Cloud)</div>
+                  <p class="text-slate-600 dark:text-slate-400 mt-1">VMware, AWS, Azure, контейнерлеу (Docker) және микросервистер.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border-l-4 border-purple-500">
+                  <div class="font-mono font-bold text-purple-600">2016–2026 жж.</div>
+                  <div class="font-bold mt-1">AI-фабрикалар және Edge</div>
+                  <p class="text-slate-600 dark:text-slate-400 mt-1">GPU-суперкластерлер, иммерсиялық салқындату, Zero-Trust және ZTNA.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Жедел жадыдағы кездейсоқ бит қателерін автоматты түрде анықтап, түзететін серверлік жады технологиясы:",
+            options: ["DDR3", "ECC (Error-Correcting Code)", "VRAM", "EEPROM"],
+            correct: 1,
+            explanation: "ECC жады серверлер мен жұмыс станцияларында деректердің бүлінуін және жүйенің кенеттен тоқтауын (BSOD/Kernel Panic) болдырмайды."
+          },
+          {
+            q: "Жүйенің ақауға төзімділігін тексеру үшін өндірістік ортада бақыланатын ақауларды әдейі енгізу әдістемесі:",
+            options: ["Chaos Engineering", "Queueing Theory", "Defragmentation", "Overclocking"],
+            correct: 0,
+            explanation: "Chaos Engineering (Хаос инженериясы) серверлердің бірі өшкенде жүйенің автоматты қалпына келу қабілетін тексереді."
+          },
+          {
+            q: "Жоғары тығыздықты ЖИ-серверлерді диэлектрлік сұйықтыққа толық батыру арқылы салқындату әдісі:",
+            options: ["Air Cooling", "Immersion Cooling", "Passive Heatsink", "Peltier"],
+            correct: 1,
+            explanation: "Immersion Cooling (Иммерсиялық салқындату) сервер платаларын ток өткізбейтін арнайы сұйықтық ваннасына батыру арқылы жылуды тиімді әкетеді."
+          },
+          {
+            q: "«Ешкімге сенбе, әрбір сұранысты үнемі тексер» қағидатына негізделген заманауи желілік қауіпсіздік архитектурасы:",
+            options: ["ZTNA (Zero Trust Network Access)", "FTP", "Telnet", "HTTP"],
+            correct: 0,
+            explanation: "ZTNA желі ішіндегі және сыртындағы барлық пайдаланушылар мен құрылғыларды қатаң аутентификациядан өткізеді."
+          },
+          {
+            q: "Дата-орталықтардың (Data Center) қолжетімділігі 99.995% болатын ең жоғары ақауға төзімділік деңгейі:",
+            options: ["Tier I", "Tier II", "Tier III", "Tier IV"],
+            correct: 3,
+            explanation: "Tier IV стандарты барлық инженерлік жүйелердің (қуат, салқындату, желі) толық екі еселенген (2N+1) резервін талап етеді."
+          }
+        ]
+      },
+      {
+        id: 7,
+        shortTitle: "Windows ОЖ негіздері және архитектурасы",
+        title: "Сабақ 7: Windows операциялық жүйесінде жұмыс істеу негіздері",
+        duration: "25 мин",
+        summary: "Windows эволюциясы (1985–2021), ішкі құрылымы (Kernel, Drivers, File System, Services, GUI), жұмыс үстелі элементтері, файл кеңейтімдері, ыстық пернелер (Win+E/I/D, Alt+Tab, Ctrl+C/V/X/Z/S/A), Snap Layouts, Windows Security және Windows 11 жүйелік талаптары.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Windows операциялық жүйесінің ішкі құрылымы</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                Қазіргі Windows ОЖ (Windows NT архитектурасы) екі негізгі режимге бөлінеді: <strong>Ядро режимі (Kernel Mode)</strong> және <strong>Пайдаланушы режимі (User Mode)</strong>. Бұл қолданбалы бағдарламалардың қателігі бүкіл жүйені құлатпауын қамтамасыз етеді.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="p-3.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50">
+                  <div class="font-bold text-indigo-800 dark:text-indigo-200 mb-1">1. Kernel (Ядро) & HAL</div>
+                  <p class="text-slate-600 dark:text-slate-300">Процестерді, ағындарды (Threads), үзілістерді және жедел жадыны басқаратын жүйенің жүрегі.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50">
+                  <div class="font-bold text-blue-800 dark:text-blue-200 mb-1">2. Device Drivers (Драйверлер)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Операциялық жүйе мен аппараттық құрылғылар (бейнекарта, принтер, дыбыс) арасындағы аудармашы бағдарламалар.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
+                  <div class="font-bold text-emerald-800 dark:text-emerald-200 mb-1">3. File System (Файлдық жүйе)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Дискідегі деректерді ұйымдастыру, сақтау және қауіпсіздік құқықтарын басқару (NTFS, ReFS, FAT32).</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
+                  <div class="font-bold text-amber-800 dark:text-amber-200 mb-1">4. System Services (Қызметтер)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Фондық режимде жұмыс істейтін жүйелік процестер (желі, басып шығару кезегі, жаңартулар).</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50 sm:col-span-2">
+                  <div class="font-bold text-purple-800 dark:text-purple-200 mb-1">5. GUI (Графикалық пайдаланушы интерфейсі)</div>
+                  <p class="text-slate-600 dark:text-slate-300">Жұмыс үстелі (Desktop), Тапсырмалар тақтасы (Taskbar), Пуск мәзірі, терезелер жүйесі және <strong>Snap Layouts</strong> (терезелерді экранға тор бойынша ыңғайлы орналастыру).</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3">2. Негізгі файл кеңейтімдері</h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800"><code class="font-bold text-brand-600">.exe / .msi</code> — Орындалатын және орнату файлдары</div>
+                  <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800"><code class="font-bold text-blue-600">.docx / .xlsx</code> — Word мәтіндік және Excel кестелік құжаттары</div>
+                  <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800"><code class="font-bold text-rose-600">.pdf</code> — Портативті құжат форматы</div>
+                  <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800"><code class="font-bold text-emerald-600">.jpg / .png / .svg</code> — Растрлық және векторлық суреттер</div>
+                  <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800"><code class="font-bold text-amber-600">.zip / .rar / .7z</code> — Сығылған мұрағат файлдары</div>
+                  <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800"><code class="font-bold text-purple-600">.dll / .sys</code> — Жүйелік кітапханалар мен драйверлер</div>
+                </div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3">3. Windows Security және Windows 11 талаптары</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
+                  <strong>Windows Security:</strong> Кіріктірілген Microsoft Defender антивирусы, Брандмауэр (Firewall), SmartScreen сүзгісі және BitLocker диск шифрлауы.
+                </p>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
+                  <div class="font-bold text-slate-900 dark:text-white">Windows 11 минималды жүйелік талаптары:</div>
+                  <div>• <strong>Процессор:</strong> 64-бит, кемінде 1 ГГц, 2+ ядро (үйлесімді тізімнен)</div>
+                  <div>• <strong>Жады (RAM) / Диск:</strong> 4 ГБ RAM / 64 ГБ сақтау орны</div>
+                  <div>• <strong>Қауіпсіздік:</strong> UEFI, Secure Boot және <strong>TPM 2.0</strong> модулі міндетті</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <!-- Таблица эволюции Windows 1985–2021 -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Windows операциялық жүйелерінің эволюция кестесі (1985–2021)</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Жылы</th>
+                    <th class="p-3 font-bold">Нұсқасы</th>
+                    <th class="p-3 font-bold">Негізгі жаңалықтары мен архитектурасы</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-mono font-bold">1985</td>
+                    <td class="p-3 font-bold">Windows 1.0</td>
+                    <td class="p-3">MS-DOS үстінен жұмыс істейтін алғашқы 16-биттік графикалық қабықша</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-mono font-bold">1995</td>
+                    <td class="p-3 font-bold">Windows 95</td>
+                    <td class="p-3">«Пуск» (Start) батырмасы, Тапсырмалар тақтасы, 32-биттік орта, Plug and Play</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-mono font-bold">2001</td>
+                    <td class="p-3 font-bold text-brand-600">Windows XP</td>
+                    <td class="p-3">Үй және корпоративтік желілердің NT 5.1 ядросында бірігуі, Luna интерфейсі</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-mono font-bold">2009</td>
+                    <td class="p-3 font-bold text-emerald-600">Windows 7</td>
+                    <td class="p-3">Жоғары тұрақтылық, Aero интерфейсі, 64-биттік жүйелердің жаппай таралуы</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-mono font-bold">2015</td>
+                    <td class="p-3 font-bold">Windows 10</td>
+                    <td class="p-3">«Windows қызмет ретінде» моделі, DirectX 12, бірыңғай экожүйе</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-mono font-bold">2021</td>
+                    <td class="p-3 font-bold text-indigo-600">Windows 11</td>
+                    <td class="p-3">Орталықтандырылған мәзір, Snap Layouts, TPM 2.0 қауіпсіздік стандарты, Copilot ЖИ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Интерактивный справочник горячих клавиш Windows -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-base font-bold mb-3">Жылдам пернелер (Hotkeys) интерактивті анықтамалығы</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <kbd class="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-mono font-bold text-brand-600">Win + E</kbd>
+                  <span class="text-slate-600 dark:text-slate-300 text-right">Файл жетектеушісін (Explorer) ашу</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <kbd class="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-mono font-bold text-brand-600">Win + I</kbd>
+                  <span class="text-slate-600 dark:text-slate-300 text-right">Жүйе параметрлерін (Settings) ашу</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <kbd class="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-mono font-bold text-brand-600">Win + D</kbd>
+                  <span class="text-slate-600 dark:text-slate-300 text-right">Жұмыс үстелін лезде көрсету</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <kbd class="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-mono font-bold text-emerald-600">Alt + Tab</kbd>
+                  <span class="text-slate-600 dark:text-slate-300 text-right">Ашық терезелер арасында ауысу</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <kbd class="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-mono font-bold text-amber-600">Ctrl + C / V / X</kbd>
+                  <span class="text-slate-600 dark:text-slate-300 text-right">Көшіру / Қою / Қиып алу</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <kbd class="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 font-mono font-bold text-purple-600">Ctrl + Z / S / A</kbd>
+                  <span class="text-slate-600 dark:text-slate-300 text-right">Болдырмау / Сақтау / Бәрін белгілеу</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Windows операциялық жүйесінде Файл жетектеушісін (Проводник / File Explorer) жылдам ашатын пернелер тіркесімі:",
+            options: ["Win + I", "Win + E", "Win + D", "Alt + F4"],
+            correct: 1,
+            explanation: "Win + E (Explorer) пернелер тіркесімі бірден файл менеджерін ашады."
+          },
+          {
+            q: "Windows 11 операциялық жүйесін орнату үшін міндетті түрде талап етілетін аппараттық қауіпсіздік модулі:",
+            options: ["TPM 2.0", "AGP 8x", "PS/2", "Floppy Controller"],
+            correct: 0,
+            explanation: "TPM 2.0 (Trusted Platform Module) шифрлау кілттерін аппараттық деңгейде қорғау үшін Windows 11-де міндетті талап болып табылады."
+          },
+          {
+            q: "Операциялық жүйе мен нақты аппараттық құрылғы (мысалы, бейнекарта немесе принтер) арасындағы байланысты қамтамасыз ететін бағдарлама:",
+            options: ["Архиватор", "Драйвер (Device Driver)", "Браузер", "Компилятор"],
+            correct: 1,
+            explanation: "Драйвер ОЖ ядросының командаларын нақты құрылғының контроллері түсінетін сигналдарға түрлендіреді."
+          },
+          {
+            q: "Windows 11-де ашық терезелерді экран бөліктеріне геометриялық тор бойынша ыңғайлы орналастыру функциясы:",
+            options: ["Safe Mode", "Snap Layouts", "Disk Defragmenter", "Command Prompt"],
+            correct: 1,
+            explanation: "Snap Layouts терезені үлкейту батырмасына курсорды апарғанда экранды 2, 3 немесе 4 аймаққа бөлу үлгілерін ұсынады."
+          },
+          {
+            q: "Барлық ашық терезелерді лезде жиырып, Жұмыс үстелін (Desktop) көрсету пернелер тіркесімі:",
+            options: ["Win + D", "Ctrl + S", "Ctrl + A", "Win + L"],
+            correct: 0,
+            explanation: "Win + D (Desktop) барлық терезелерді уақытша жиырып, жұмыс үстелін ашады; қайта басқанда терезелерді орнына қайтарады."
+          }
+        ]
+      },
+      {
+        id: 8,
+        shortTitle: "Windows XP: тарихы, архитектурасы және маңызы",
+        title: "Сабақ 8: Windows XP операциялық жүйесі: тарихы, ерекшеліктері және маңызы",
+        duration: "25 мин",
+        summary: "Neptune + Odyssey = Whistler жобасы, Windows NT 5.1 ядросы, Luna интерфейсі, ClearType технологиясы, шығарылымдар (Home, Pro, 64-Bit, Media Center, Tablet PC, Starter), Service Pack 1/2/3 хронологиясы, артықшылықтары мен кемшіліктері, 2014 ж. 9 сәуір қолдаудың аяқталуы.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-gradient-to-br from-blue-50 to-emerald-50/70 dark:from-blue-950/40 dark:to-slate-900 border border-blue-200 dark:border-blue-800/50 rounded-2xl p-6">
+              <h3 class="text-lg font-bold text-blue-900 dark:text-blue-200 mb-2">1. Шығу тарихы: Neptune + Odyssey = Whistler (NT 5.1)</h3>
+              <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                1990-жылдардың соңында Microsoft екі тәуелсіз тармақты дамытты: үй пайдаланушыларына арналған MS-DOS негізіндегі <strong>Windows 9x/Me</strong> және корпоративтік нарыққа арналған тұрақты <strong>Windows NT/2000</strong>. 2000 жылы үй жүйесі (кодтық атауы <em>Neptune</em>) мен бизнес жүйесі (<em>Odyssey</em>) біртұтас <strong>Whistler</strong> жобасына біріктірілді. Нәтижесінде 2001 жылдың 25 қазанында <strong>Windows NT 5.1</strong> ядросына негізделген <strong>Windows XP (eXPerience)</strong> жарық көрді.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3">2. Интерфейс және Технологиялық жаңалықтар</h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li><strong>Luna интерфейсі:</strong> Дөңгелектелген терезе бұрыштары, жарқын көк-жасыл түстер палитрасы және әйгілі «Bliss» (Жасыл төбелер) тұсқағазы.</li>
+                  <li><strong>ClearType технологиясы:</strong> Сұйық кристалды (LCD) мониторларда қаріптердің анықтығы мен оқылуын субпиксельдік тегістеу арқылы жақсарту.</li>
+                  <li><strong>Fast User Switching:</strong> Ағымдағы бағдарламаларды жаппай, бір компьютерде бірнеше пайдаланушы арасында жылдам ауысу.</li>
+                  <li><strong>Remote Desktop (RDP):</strong> Компьютерге желі арқылы қашықтан қосылу мүмкіндігі.</li>
+                </ul>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3">3. Service Pack 1, 2, 3 хронологиясы</h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  <li><strong>SP1 (2002 ж. қыркүйек):</strong> USB 2.0 стандартын толық қолдау және әдепкі бағдарламаларды таңдау мүмкіндігі.</li>
+                  <li><strong>SP2 (2004 ж. тамыз):</strong> Ең маңызды қауіпсіздік жаңартуы! <strong>Windows Firewall</strong> әдепкі бойынша қосылды, Windows Security Center және Wi-Fi WPA қолдауы енгізілді.</li>
+                  <li><strong>SP3 (2008 ж. сәуір):</strong> Соңғы ірі жинақтаушы пакет — өнімділікті оңтайландыру, WPA2 қолдауы және желілік қорғаныс (NAP).</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+              <div class="p-5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
+                <h4 class="font-bold text-emerald-900 dark:text-emerald-200 mb-2">Артықшылықтары:</h4>
+                <ul class="list-disc pl-5 space-y-1 text-xs text-slate-700 dark:text-slate-300">
+                  <li>NT ядросының арқасында Windows 98/Me-ге қарағанда теңдессіз тұрақтылық.</li>
+                  <li>Ресурстарға талабы төмен (128–256 МБ RAM-да жұмыс істей алды).</li>
+                  <li>Он жылдан астам уақыт бойы бағдарламалар мен драйверлердің ең кең экожүйесі.</li>
+                </ul>
+              </div>
+              <div class="p-5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50">
+                <h4 class="font-bold text-rose-900 dark:text-rose-200 mb-2">Кемшіліктері және Қолдаудың аяқталуы:</h4>
+                <ul class="list-disc pl-5 space-y-1 text-xs text-slate-700 dark:text-slate-300">
+                  <li>Алғашқы нұсқаларында әкімші құқығымен әдепкі жұмыс істеу вирустарға осалдық тудырды.</li>
+                  <li>Заманауи көпядролы процессорлар мен 4 ГБ-тан үлкен жадыны (32-бит нұсқада) толық игере алмауы.</li>
+                  <li><strong>2014 жылдың 9 сәуірінде</strong> Microsoft Windows XP-ге ресми техникалық қолдау мен қауіпсіздік жаңартуларын толық тоқтатты.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+            <h3 class="text-base font-bold mb-4">Windows XP негізгі шығарылымдары (Editions) кестесі</h3>
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                  <th class="p-3 font-bold">Шығарылым атауы</th>
+                  <th class="p-3 font-bold">Мақсатты аудитория</th>
+                  <th class="p-3 font-bold">Негізгі ерекшеліктері</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                <tr>
+                  <td class="p-3 font-bold text-emerald-600">Home Edition</td>
+                  <td class="p-3">Үй пайдаланушылары</td>
+                  <td class="p-3">Қарапайым желілік құралдар, корпоративтік доменге қосылу және RDP сервері жоқ</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold text-blue-600">Professional</td>
+                  <td class="p-3">Бизнес және кәсіби мамандар</td>
+                  <td class="p-3">Active Directory домені, EFS файл шифрлауы, Remote Desktop, 2 физикалық CPU қолдауы</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold text-purple-600">Professional x64 Edition</td>
+                  <td class="p-3">64-биттік жұмыс станциялары</td>
+                  <td class="p-3">x86-64 архитектурасы, 128 ГБ дейінгі жедел жадыны қолдау</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold text-amber-600">Media Center Edition</td>
+                  <td class="p-3">Үй кинотеатрлары (HTPC)</td>
+                  <td class="p-3">ТВ-тюнерлерді, пультпен басқаруды және мультимедиа орталығын қолдау</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold text-cyan-600">Tablet PC Edition</td>
+                  <td class="p-3">Сенсорлық планшеттік ДК</td>
+                  <td class="p-3">Стилуспен қолжазба мәтінді тану (Handwriting Recognition)</td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold text-slate-600 dark:text-slate-400">Starter Edition</td>
+                  <td class="p-3">Дамушы нарықтардағы арзан ДК</td>
+                  <td class="p-3">Бір уақытта тек 3 бағдарламаны іске қосу шектеуі және жеңілдетілген мүмкіндіктер</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Windows XP операциялық жүйесі қандай екі жобаның бірігуі нәтижесінде (кодтық атауы Whistler) пайда болды?",
+            options: ["Chicago және Memphis", "Neptune және Odyssey", "Longhorn және Vienna", "Spartan және Threshold"],
+            correct: 1,
+            explanation: "Үй жүйесі (Neptune) мен корпоративтік жүйе (Odyssey) біріктіріліп, NT 5.1 ядросындағы Whistler (Windows XP) жасалды."
+          },
+          {
+            q: "Сұйық кристалды (LCD) мониторларда қаріптердің анықтығын арттыру үшін Windows XP-де енгізілген технология:",
+            options: ["DirectX", "ClearType", "ActiveX", "BitLocker"],
+            correct: 1,
+            explanation: "ClearType субпиксельдік рендеринг арқылы LCD экрандардағы мәтін жиектерін тегістеп, оқуды жеңілдетеді."
+          },
+          {
+            q: "Windows XP-де кіріктірілген желіаралық экран (Windows Firewall) әдепкі бойынша қосылған ең маңызды жаңарту пакеті:",
+            options: ["Service Pack 1", "Service Pack 2 (2004 ж.)", "Service Pack 3", "DirectX 8"],
+            correct: 1,
+            explanation: "2004 жылы шыққан SP2 Windows XP қауіпсіздігін түбегейлі күшейтіп, брандмауэрді автоматты түрде іске қосты."
+          },
+          {
+            q: "Microsoft компаниясы Windows XP операциялық жүйесіне ресми техникалық қолдауды қай күні тоқтатты?",
+            options: ["2009 жылғы 22 қазан", "2014 жылғы 9 сәуір", "2020 жылғы 14 қаңтар", "2012 жылғы 26 қазан"],
+            correct: 1,
+            explanation: "12 жылдан астам қолдаудан кейін 2014 жылдың 9 сәуірінде Windows XP ресми түрде ескірген жүйе деп жарияланды."
+          },
+          {
+            q: "Windows XP-дің стандартты көк-жасыл графикалық тақырыбы (интерфейсі) қалай аталады?",
+            options: ["Aero", "Luna", "Metro", "Fluent"],
+            correct: 1,
+            explanation: "Luna — Windows XP-дің фирмалық графикалық стилі (ал Aero — Windows Vista/7 интерфейсі)."
+          }
+        ]
+      },
+      {
+        id: 9,
+        shortTitle: "Файлдарды басқару және файлдық жүйелер",
+        title: "Сабақ 9: Windows ОЖ-де файлдарды басқару және файлдық жүйелер",
+        duration: "30 мин",
+        summary: "NTFS, FAT32, exFAT, ReFS салыстырмалы кестесі, MFT (Master File Table), B-tree және B+ tree құрылымдары, Allocate-on-write, кластерлеу, фрагментация, ACL, EFS шифрлау, журналдау, Self-healing, ақпарат өлшем бірліктері және болашақ концепциялар (Q-exFAT, N-NTFS, Bio-ReFS, DNA-FAT, Pulsar-ReFS).",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Файлдық жүйелердің ішкі механизмдері</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <strong>Файлдық жүйе</strong> — деректерді сақтау құрылғыларында (HDD, SSD, USB Flash) файлдарды атау, орналастыру, іздеу және оларға қол жеткізу құқықтарын реттейтін логикалық құрылым.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50">
+                  <div class="font-bold text-indigo-900 dark:text-indigo-200 mb-1">MFT (Master File Table) және B-tree / B+ tree</div>
+                  <p class="text-slate-700 dark:text-slate-300">NTFS жүйесінде барлық файлдар туралы метадеректер (атауы, өлшемі, уақыты, кластерлер адресі) <strong>MFT</strong> кестесінде сақталады. Іздеуді жылдамдату үшін теңгерімделген <strong>B-tree / B+ tree</strong> ағаш құрылымдары қолданылады.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
+                  <div class="font-bold text-emerald-900 dark:text-emerald-200 mb-1">Журналдау (Journaling) және Self-Healing</div>
+                  <p class="text-slate-700 dark:text-slate-300">NTFS өзгерістерді алдымен журналға жазады — тоқ кенет өшкенде деректер бүлінбейді. Ал ReFS жүйесінде <strong>Allocate-on-write</strong> және <strong>Self-healing</strong> (деректердің бүтіндігін тексеру сомалары арқылы автоматты қалпына келтіру) бар.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
+                  <div class="font-bold text-amber-900 dark:text-amber-200 mb-1">Кластерлеу және Фрагментация</div>
+                  <p class="text-slate-700 dark:text-slate-300"><strong>Кластер</strong> — файлға бөлінетін ең кіші логикалық диск бірлігі (әдетте 4 КБ). Файл бөліктері дискінің әр жеріне шашырап жазылса, <strong>фрагментация</strong> туындайды (HDD жылдамдығын баяулатады).</p>
+                </div>
+                <div class="p-4 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50">
+                  <div class="font-bold text-rose-900 dark:text-rose-200 mb-1">Қауіпсіздік: ACL және EFS</div>
+                  <p class="text-slate-700 dark:text-slate-300"><strong>ACL (Access Control List)</strong> — әр пайдаланушыға оқу/жазу/өзгерту рұқсаттарын белгілейді. <strong>EFS (Encrypting File System)</strong> — файлдарды мөлдір криптографиялық шифрлау.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-900 text-white rounded-2xl p-5">
+              <h3 class="text-base font-bold text-cyan-300 mb-3">2. Файлдық жүйелердің болашақ концепциялары</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-white/10">
+                  <strong class="text-indigo-300">Q-exFAT (Quantum exFAT):</strong> Кванттық жады мен кубит күйлерін индекстеуге бейімделген портативті жүйе.
+                </div>
+                <div class="p-3 rounded-xl bg-white/10">
+                  <strong class="text-emerald-300">N-NTFS (Neural NTFS):</strong> Пайдаланушының сұраныстарын болжап, файлдарды кэшке алдын ала жүктейтін ЖИ-жүйе.
+                </div>
+                <div class="p-3 rounded-xl bg-white/10">
+                  <strong class="text-amber-300">Bio-ReFS & DNA-FAT:</strong> Био-сақтауыштар мен синтетикалық ДНҚ тізбектерінде петабайттық деректерді қатесіз сақтау.
+                </div>
+                <div class="p-3 rounded-xl bg-white/10 sm:col-span-3">
+                  <strong class="text-rose-300">Pulsar-ReFS:</strong> Ғарыштық және планетааралық байланыс желілеріндегі жоғары кідірістерге төзімді үлестірілген файлдық жүйе.
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <!-- Сравнительная таблица NTFS, FAT32, exFAT, ReFS -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Windows файлдық жүйелерінің салыстырмалы кестесі</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Сипаттама</th>
+                    <th class="p-3 font-bold text-slate-600 dark:text-slate-300">FAT32</th>
+                    <th class="p-3 font-bold text-emerald-600">exFAT</th>
+                    <th class="p-3 font-bold text-brand-600">NTFS</th>
+                    <th class="p-3 font-bold text-purple-600">ReFS</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-semibold">Макс. файл өлшемі</td>
+                    <td class="p-3 font-mono text-xs text-rose-500 font-bold">4 ГБ шектеуі</td>
+                    <td class="p-3 font-mono text-xs">16 Эксабайт</td>
+                    <td class="p-3 font-mono text-xs">16 Терабайт – 8 ПБ</td>
+                    <td class="p-3 font-mono text-xs">35 Петабайт</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Журналдау (Journaling)</td>
+                    <td class="p-3">Жоқ</td>
+                    <td class="p-3">Жоқ (тек Checksum)</td>
+                    <td class="p-3 text-emerald-600 font-semibold">Бар ($LogFile)</td>
+                    <td class="p-3 text-emerald-600 font-semibold">Allocate-on-write</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Қауіпсіздік (ACL / EFS)</td>
+                    <td class="p-3">Жоқ</td>
+                    <td class="p-3">Жоқ</td>
+                    <td class="p-3 text-emerald-600 font-semibold">Толық (ACL + EFS)</td>
+                    <td class="p-3">ACL бар (EFS жоқ)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Қолданылу саласы</td>
+                    <td class="p-3">Ескі USB флешкалар, UEFI жүктеу бөлімі</td>
+                    <td class="p-3">Үлкен сыртқы SSD/Flash (Windows + macOS)</td>
+                    <td class="p-3">Windows жүйелік дискісі (C:)</td>
+                    <td class="p-3">Серверлер, деректер қоймалары, Hyper-V</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Интерактивный конвертер единиц измерения информации -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-base font-bold mb-1">Интерактивті конвертер: Ақпарат өлшем бірліктері</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Мәнді енгізіңіз — жүйе екілік (IEC: КиБ/МиБ/ГиБ — 1024) және ондық (SI: КБ/МБ/ГБ — 1000) мәндерін есептейді.</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                <input type="number" id="unit-input-val" value="4" min="0" oninput="convertUnits()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono text-sm">
+                <select id="unit-input-type" onchange="convertUnits()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm">
+                  <option value="GB" selected>Гигабайт (ГБ / GiB)</option>
+                  <option value="MB">Мегабайт (МБ / MiB)</option>
+                  <option value="TB">Терабайт (ТБ / TiB)</option>
+                  <option value="KB">Килобайт (КБ / KiB)</option>
+                </select>
+                <div class="p-2.5 rounded-xl bg-brand-50 dark:bg-brand-950/50 border border-brand-200 dark:border-brand-800 flex items-center justify-center text-xs font-semibold text-brand-700 dark:text-brand-300">
+                  1 Байттa = 8 Бит
+                </div>
+              </div>
+              <div id="unit-results-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                <!-- Заполняется через JS -->
+              </div>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "FAT32 файлдық жүйесінің ең басты техникалық шектеуі қандай?",
+            options: [
+              "Бір файлдың максималды өлшемі 4 ГБ-тан аспауы тиіс",
+              "Тек мәтіндік файлдарды ғана сақтай алады",
+              "USB флешкаларда жұмыс істемейді",
+              "Папкалар құруға болмайды"
+            ],
+            correct: 0,
+            explanation: "FAT32 жүйесінде файл өлшемін сақтауға 32 бит бөлінгендіктен, 4 ГБ-тан үлкен бейнефайл немесе ISO образ жазу мүмкін емес."
+          },
+          {
+            q: "NTFS файлдық жүйесінде барлық файлдар мен каталогтар туралы метадеректер сақталатын басты жүйелік кесте:",
+            options: ["FAT", "MFT (Master File Table)", "MBR", "BIOS"],
+            correct: 1,
+            explanation: "MFT (Бас файлдық кесте) NTFS-тегі әрбір файлдың атрибуттарын, қауіпсіздік құқықтарын және кластер адрестерін сақтайды."
+          },
+          {
+            q: "Деректердің бүлінуін тексеру сомалары арқылы автоматты түрде анықтап, қалпына келтіретін (Self-healing) заманауи серверлік файлдық жүйе:",
+            options: ["FAT16", "ReFS (Resilient File System)", "CDFS", "exFAT"],
+            correct: 1,
+            explanation: "ReFS (Төзімді файлдық жүйе) үлкен деректер қоймалары мен серверлерде деректердің тұтастығын автоматты қорғауға арналған."
+          },
+          {
+            q: "NTFS жүйесінде файлдарды пайдаланушының кілттері арқылы криптографиялық шифрлау технологиясы:",
+            options: ["EFS (Encrypting File System)", "ACL", "DHCP", "HDMI"],
+            correct: 0,
+            explanation: "EFS файлдар мен папкаларды дискіде шифрланған күйде сақтауға мүмкіндік береді."
+          },
+          {
+            q: "Көлемі 4 ГБ-тан асатын файлдарды жазуға болатын және Windows пен macOS жүйелерінде бірдей үйлесімді жұмыс істейтін флешкаларға арналған файлдық жүйе:",
+            options: ["FAT32", "exFAT", "EXT4", "NTFS"],
+            correct: 1,
+            explanation: "exFAT (Extended FAT) FAT32-нің 4 ГБ шектеуін алып тастайды және көптеген ОЖ-лермен қосымша драйверсіз жұмыс істейді."
+          }
+        ]
+      },
+      {
+        id: 10,
+        shortTitle: "Қабықша-программалар: NC, FAR, Total Commander",
+        title: "Сабақ 10: Қабықша-программалар: Norton Commander, FAR Manager, Total Commander",
+        duration: "30 мин",
+        summary: "Қабықша-программалардың 3 буын эволюциясы, Norton Commander (1986, MS-DOS), FAR Manager (1996, консольдық Win32), Total Commander (1993, Windows GUI), салыстырмалы кесте, функционалдық пернелер (F3, F4, F5, F6, F7, F8), AI-DOS / ImmuneOS және болашақ 3D/нейро-синхронды қабықшалар.",
+        theoryHTML: `
+          <div class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">1. Қабықша-программалар (File Managers / Shells) және 3 буын эволюциясы</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <strong>Қабықша-программа (Shell)</strong> — операциялық жүйенің командалық жолы (CLI) мен пайдаланушы арасындағы ыңғайлы интерфейсті қамтамасыз ететін, файлдық операцияларды (көшіру, жылжыту, іздеу, мұрағаттау) жылдамдататын бағдарлама. Классикалық стандарт — <strong>екі панельді ортодоксалды файл менеджерлері (OFM)</strong>.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50">
+                  <span class="font-mono font-bold text-blue-600">I буын • 1986 ж.</span>
+                  <h4 class="font-bold text-sm mt-1 mb-1">Norton Commander (NC)</h4>
+                  <p class="text-slate-600 dark:text-slate-300">Джон Соча (Peter Norton Computing) MS-DOS үшін жасаған. Екі көк панель мен F1–F10 пернелер стандартының негізін қалаушы.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800/50">
+                  <span class="font-mono font-bold text-cyan-600">II буын • 1996 ж.</span>
+                  <h4 class="font-bold text-sm mt-1 mb-1">FAR Manager</h4>
+                  <p class="text-slate-600 dark:text-slate-300">Евгений Рошал жасаған Windows консольдық (мәтіндік) файл менеджері. Ұзын файл атауларын, Юникодты, плагиндерді және FTP/архивтерді қолдайды.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
+                  <span class="font-mono font-bold text-emerald-600">III буын • 1993 ж.</span>
+                  <h4 class="font-bold text-sm mt-1 mb-1">Total Commander</h4>
+                  <p class="text-slate-600 dark:text-slate-300">Кристиан Гислер жасаған (бұрынғы Windows Commander). Толық графикалық (GUI) интерфейс, қойындылар (Tabs), топтық атау өзгерту (Multi-Rename) және кіріктірілген FTP/SFTP.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-3">2. Функционалдық пернелер стандарты (F3 – F8)</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs text-center">
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div class="font-mono font-extrabold text-brand-600 text-sm">F3</div>
+                  <div class="font-semibold mt-1">Қарау (View)</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div class="font-mono font-extrabold text-brand-600 text-sm">F4</div>
+                  <div class="font-semibold mt-1">Өңдеу (Edit)</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div class="font-mono font-extrabold text-emerald-600 text-sm">F5</div>
+                  <div class="font-semibold mt-1">Көшіру (Copy)</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div class="font-mono font-extrabold text-amber-600 text-sm">F6</div>
+                  <div class="font-semibold mt-1">Жылжыту (Move)</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div class="font-mono font-extrabold text-purple-600 text-sm">F7</div>
+                  <div class="font-semibold mt-1">Жаңа папка (MkDir)</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <div class="font-mono font-extrabold text-rose-600 text-sm">F8</div>
+                  <div class="font-semibold mt-1">Жою (Delete)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-900 text-white rounded-2xl p-5">
+              <h3 class="text-base font-bold text-indigo-300 mb-3">3. Болашақ қабықша-программалар: AI-DOS, ImmuneOS және 3D/Нейро-қабықшалар</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div class="p-3.5 rounded-xl bg-white/10">
+                  <div class="font-bold text-cyan-300 mb-1">AI-DOS (Интеллектуалды қабықша)</div>
+                  <p class="text-slate-200">Табиғи тілдегі сұраныстарды («Өткен аптадағы барлық PDF есептерді мұрағатта») автоматты скрипттерге айналдыратын қабықша.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/10">
+                  <div class="font-bold text-emerald-300 mb-1">ImmuneOS концепциясы</div>
+                  <p class="text-slate-200">Кез келген файлдық операцияны (F5/F6) орындамас бұрын мінез-құлықтық антивирустық оқшаулаудан (Sandbox) өткізетін қорғалған орта.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/10">
+                  <div class="font-bold text-purple-300 mb-1">3D / Нейро-синхронды қабықшалар</div>
+                  <p class="text-slate-200">VR/AR кеңістігіндегі көлемді файлдық графтар және нейроинтерфейс (BCI) арқылы оймен басқарылатын орталар.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        interactiveHTML: `
+          <div class="space-y-6">
+            <!-- Интерактивный двухпанельный эмулятор FAR Manager / Norton Commander -->
+            <div class="bg-slate-950 border-2 border-cyan-500/60 rounded-2xl p-4 font-mono text-xs text-cyan-200 shadow-xl">
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-3 border-b border-cyan-800">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-cyan-500 text-slate-950 font-bold">FAR / NC ЭМУЛЯТОР</span>
+                  <span class="text-cyan-400">Екі панельді файл менеджері тренажері</span>
+                </div>
+                <span class="text-[11px] text-amber-300">Файлды таңдап, төмендегі F3–F8 батырмаларын басыңыз</span>
+              </div>
+
+              <!-- Две панели -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <!-- Левая панель -->
+                <div onclick="setActivePanel('left')" id="far-panel-left" class="bg-[#000080] border-2 border-cyan-300 rounded-lg p-2.5 cursor-pointer">
+                  <div class="text-center bg-cyan-300 text-[#000080] font-bold py-0.5 mb-2 rounded-xs">
+                    C:\Users\Student\Lectures
+                  </div>
+                  <div id="far-left-list" class="space-y-1 min-h-[140px]">
+                    <!-- Рендерится через JS -->
+                  </div>
+                </div>
+
+                <!-- Правая панель -->
+                <div onclick="setActivePanel('right')" id="far-panel-right" class="bg-[#000080] border-2 border-cyan-800 rounded-lg p-2.5 cursor-pointer">
+                  <div class="text-center bg-cyan-800 text-cyan-100 font-bold py-0.5 mb-2 rounded-xs">
+                    D:\Backup_Course
+                  </div>
+                  <div id="far-right-list" class="space-y-1 min-h-[140px]">
+                    <!-- Рендерится через JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Окно просмотра/сообщений -->
+              <div id="far-console-output" class="bg-slate-900 border border-cyan-800/80 rounded-lg p-2.5 mb-3 text-emerald-300 text-[11px]">
+                &gt; Жүйе дайын. Сол немесе оң панельдегі файлды шертіп таңдаңыз, сосын F3 (Қарау), F5 (Көшіру), F6 (Жылжыту), F7 (Жаңа папка) немесе F8 (Жою) басыңыз.
+              </div>
+
+              <!-- Панель функциональных клавиш -->
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-[11px]">
+                <button onclick="farAction('F3')" class="py-1.5 px-2 rounded bg-cyan-700 hover:bg-cyan-600 text-white font-bold">F3 Қарау</button>
+                <button onclick="farAction('F4')" class="py-1.5 px-2 rounded bg-cyan-700 hover:bg-cyan-600 text-white font-bold">F4 Өңдеу</button>
+                <button onclick="farAction('F5')" class="py-1.5 px-2 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-bold">F5 Көшіру</button>
+                <button onclick="farAction('F6')" class="py-1.5 px-2 rounded bg-amber-700 hover:bg-amber-600 text-white font-bold">F6 Жылжыту</button>
+                <button onclick="farAction('F7')" class="py-1.5 px-2 rounded bg-indigo-700 hover:bg-indigo-600 text-white font-bold">F7 Папка</button>
+                <button onclick="farAction('F8')" class="py-1.5 px-2 rounded bg-rose-700 hover:bg-rose-600 text-white font-bold">F8 Жою</button>
+              </div>
+            </div>
+
+            <!-- Сравнительная таблица NC, FAR, Total Commander -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 overflow-x-auto">
+              <h3 class="text-base font-bold mb-4">Қабықша-программалардың салыстырмалы кестесі</h3>
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
+                    <th class="p-3 font-bold">Параметр</th>
+                    <th class="p-3 font-bold text-blue-600">Norton Commander</th>
+                    <th class="p-3 font-bold text-cyan-600">FAR Manager</th>
+                    <th class="p-3 font-bold text-emerald-600">Total Commander</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-semibold">Шыққан жылы / Авторы</td>
+                    <td class="p-3">1986 ж., Джон Соча</td>
+                    <td class="p-3">1996 ж., Евгений Рошал</td>
+                    <td class="p-3">1993 ж., Кристиан Гислер</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Ортасы және Интерфейсі</td>
+                    <td class="p-3">16-бит MS-DOS (Мәтіндік)</td>
+                    <td class="p-3">32/64-бит Windows Console (Мәтіндік)</td>
+                    <td class="p-3">32/64-бит Windows GUI (Графикалық)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Плагиндер мен Желі</td>
+                    <td class="p-3">Шектеулі (LPT/COM байланыс)</td>
+                    <td class="p-3">Өте қуатты плагиндер (FTP, SFTP, RegEdit, WinSCP)</td>
+                    <td class="p-3">Кіріктірілген FTP/SFTP, WCX/WDX/WFX плагиндері</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold">Ерекше мүмкіндіктері</td>
+                    <td class="p-3">Екі панельді стандарттың негізін салушы</td>
+                    <td class="p-3">Пернетақтамен ультра-жылдам басқару, макростар</td>
+                    <td class="p-3">Қойындылар (Tabs), топтық атау өзгерту (Ctrl+M), каталогтарды синхрондау</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "1986 жылы MS-DOS ортасы үшін алғашқы екі панельді Norton Commander қабықшасын жасаған бағдарламашы:",
+            options: ["Линус Торвальдс", "Джон Соча (John Socha)", "Билл Гейтс", "Евгений Рошал"],
+            correct: 1,
+            explanation: "Джон Соча Norton Commander бағдарламасын жасап, екі панельді файл менеджерлерінің (OFM) әлемдік стандартын қалыптастырды."
+          },
+          {
+            q: "Norton Commander, FAR Manager және Total Commander бағдарламаларында белгіленген файлды бір панельден екінші панельге КӨШІРУ пернесі:",
+            options: ["F3", "F5", "F6", "F8"],
+            correct: 1,
+            explanation: "F5 — Көшіру (Copy), ал F6 — Жылжыту / Атын өзгерту (Move/Rename) пернесі."
+          },
+          {
+            q: "Евгений Рошал жасаған, Windows консольдық режимінде жұмыс істейтін және плагиндерге бай қабықша-программа:",
+            options: ["FAR Manager", "Windows Explorer", "Finder", "Midnight Commander"],
+            correct: 0,
+            explanation: "FAR Manager (File and Archive Manager) 1996 жылы Win32 консольдық ортасы үшін жасалған."
+          },
+          {
+            q: "Қабықша-программаларда F8 функционалдық пернесі қандай әрекетті орындайды?",
+            options: ["Файлды қарау", "Жаңа каталог (папка) құру", "Файлды немесе каталогты жою (Delete)", "Анықтаманы ашу"],
+            correct: 2,
+            explanation: "F7 — жаңа каталог құру (MkDir), ал F8 — таңдалған объектіні жою (Delete)."
+          },
+          {
+            q: "Графикалық (GUI) интерфейсі, көптеген қойындылары (Tabs) және топтық атау өзгерту құралы бар ІІІ буын қабықша-программа:",
+            options: ["MS-DOS Shell", "Total Commander", "NC 1.0", "BIOS Setup"],
+            correct: 1,
+            explanation: "Total Commander — Windows-қа арналған ең танымал графикалық екі панельді файл менеджері."
+          }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // ИТОГОВЫЙ ЭКЗАМЕН (15 ВОПРОСОВ ПО ВСЕМ 10 ТЕМАМ)
+    // =========================================================================
+    const FINAL_EXAM_QUESTIONS = [
+      {
+        q: "1. Арифметикалық және логикалық операцияларды тікелей орындайтын микропроцессордың негізгі блогы:",
+        options: ["АЛҚ (ALU)", "Кэш L3", "BIOS", "SATA контроллері"],
+        correct: 0
+      },
+      {
+        q: "2. Қысқартылған командалар жиынтығына (бір тактіде орындалатын қарапайым командалар) негізделген архитектура:",
+        options: ["CISC", "RISC", "PMOS", "VLIW"],
+        correct: 1
+      },
+      {
+        q: "3. Жеке кремний зауыты жоқ, тек микросхема архитектурасын жобалайтын компаниялар (NVIDIA, Qualcomm) қалай аталады?",
+        options: ["Foundry", "IDM", "Fabless", "OEM"],
+        correct: 2
+      },
+      {
+        q: "4. Дәстүрлі аналық платада CPU, RAM және бейнекартаны өзара байланыстырған жоғары жылдамдықты көпір:",
+        options: ["Солтүстік көпір (Northbridge)", "Оңтүстік көпір (Southbridge)", "ISA слоты", "COM порт"],
+        correct: 0
+      },
+      {
+        q: "5. Егер адрестік шинаның ені 32 бит болса, процессор тікелей қанша жедел жадыны адрестей алады?",
+        options: ["2 ГБ", "4 ГБ", "8 ГБ", "64 ГБ"],
+        correct: 1
+      },
+      {
+        q: "6. Шиналарды физикалық деңгейде модельдеу кезінде сигнал тұтастығын (Signal Integrity) бағалау диаграммасы:",
+        options: ["Eye Diagram (Көз диаграммасы)", "Gantt Chart", "Pie Chart", "Flowchart"],
+        correct: 0
+      },
+      {
+        q: "7. Жылдам таратушы мен баяу қабылдаушы құрылғылардың жылдамдық айырмашылығын теңестіретін уақытша жады механизмі:",
+        options: ["Буферизация (FIFO)", "Фрагментация", "Дефрагментация", "Архивация"],
+        correct: 0
+      },
+      {
+        q: "8. Көздің шаршауын алдын алуға арналған «20-20-20» ережесі бойынша әр 20 минут сайын қанша қашықтыққа қарау керек?",
+        options: ["20 сантиметр", "20 фут (~6 метр)", "20 метр", "200 метр"],
+        correct: 1
+      },
+      {
+        q: "9. Серверлік жедел жадыда (RAM) кездейсоқ бит қателерін автоматты түзететін технология:",
+        options: ["ECC (Error-Correcting Code)", "OLED", "ClearType", "HDMI"],
+        correct: 0
+      },
+      {
+        q: "10. Жүйенің төзімділігін тексеру үшін өндірістік ортада әдейі басқарылатын ақаулар тудыру әдісі:",
+        options: ["Chaos Engineering", "Snap Layouts", "Plug and Play", "ClearType"],
+        correct: 0
+      },
+      {
+        q: "11. Windows 11 операциялық жүйесін орнату үшін міндетті түрде талап етілетін қауіпсіздік чипі:",
+        options: ["TPM 2.0", "AGP", "PS/2", "PCI 1.0"],
+        correct: 0
+      },
+      {
+        q: "12. Windows XP операциялық жүйесі қандай ядро негізінде құрылды?",
+        options: ["Windows NT 5.1", "MS-DOS 6.22", "Linux 2.4", "macOS Darwin"],
+        correct: 0
+      },
+      {
+        q: "13. FAT32 файлдық жүйесінде бір файлдың максималды өлшемі қанша?",
+        options: ["2 ГБ", "4 ГБ", "16 ГБ", "Шексіз"],
+        correct: 1
+      },
+      {
+        q: "14. NTFS файлдық жүйесінде барлық файлдар туралы метадеректер сақталатын басты жүйелік кесте:",
+        options: ["MFT (Master File Table)", "MBR", "CMOS", "POST"],
+        correct: 0
+      },
+      {
+        q: "15. Norton Commander, FAR Manager және Total Commander бағдарламаларында файлды КӨШІРУ пернесі:",
+        options: ["F3", "F5", "F7", "F8"],
+        correct: 1
+      }
+    ];
+
+    // =========================================================================
+    // СОСТОЯНИЕ ПРИЛОЖЕНИЯ И СОХРАНЕНИЕ В LOCALSTORAGE
+    // =========================================================================
+    const STORAGE_KEY = "kaz_arch_lms_progress_v1";
+
+    let appState = {
+      currentLessonIndex: 0,
+      currentStep: 0, // 0: Теория, 1: Схемы/Таблицы, 2: Тест
+      viewMode: "lesson", // "lesson" | "exam"
+      completedLessons: {}, // { [lessonId]: { score: 5, total: 5, passed: true, answers: {} } }
+      examResult: null, // { score: 14, total: 15, passed: true, studentName: "" }
+      darkMode: false
+    };
+
+    // Состояние эмулятора FAR Manager
+    let farState = {
+      activePanel: "left",
+      selectedIdx: 0,
+      leftFiles: [
+        { name: "Lekciya_01_CPU.pdf", size: "2.4 MB", type: "file", desc: "Микропроцессор архитектурасы және түрлері (CISC/RISC/SoC)." },
+        { name: "Lekciya_03_Bus.pdf", size: "3.1 MB", type: "file", desc: "Жүйелік шиналар: Data, Address, Control Bus және модельдеу." },
+        { name: "Windows_XP_Notes.txt", size: "48 KB", type: "file", desc: "Windows NT 5.1 ядросы, Luna интерфейсі және SP1-SP3 хронологиясы." },
+        { name: "Lab_Works", size: "<DIR>", type: "dir", desc: "Зертханалық жұмыстар каталогы (10 зертханалық жұмыс)." }
+      ],
+      rightFiles: [
+        { name: "NTFS_vs_ReFS.xlsx", size: "1.1 MB", type: "file", desc: "Файлдық жүйелердің салыстырмалы кестесі (MFT, ACL, EFS)." },
+        { name: "Server_Arch.pdf", size: "4.8 MB", type: "file", desc: "Tier III/IV дата-орталықтар, Hypervisor, Kubernetes және Chaos Engineering." }
+      ]
+    };
+
+    let eyeTimerInterval = null;
+    let eyeSecondsLeft = 20;
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          appState = { ...appState, ...parsed };
+        }
+      } catch (e) {
+        console.error("State load error:", e);
+      }
+      applyTheme();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.error("State save error:", e);
+      }
+      updateSidebarUI();
+    }
+
+    // =========================================================================
+    // ТЕМА ОФОРМЛЕНИЯ И МОДАЛЬНЫЕ ОКНА
+    // =========================================================================
+    function applyTheme() {
+      const html = document.documentElement;
+      if (appState.darkMode) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+    }
+
+    function toggleTheme() {
+      appState.darkMode = !appState.darkMode;
+      applyTheme();
+      saveState();
+    }
+
+    function toggleSidebar(open) {
+      const sb = document.getElementById("sidebar");
+      const ov = document.getElementById("sidebar-overlay");
+      if (open) {
+        sb.classList.remove("-translate-x-full");
+        ov.classList.remove("hidden");
+      } else {
+        sb.classList.add("-translate-x-full");
+        ov.classList.add("hidden");
+      }
+    }
+
+    function showModal(title, body, onConfirm = null) {
+      document.getElementById("modal-title").textContent = title;
+      document.getElementById("modal-body").textContent = body;
+      const modal = document.getElementById("custom-modal");
+      const confirmBtn = document.getElementById("modal-confirm-btn");
+      const cancelBtn = document.getElementById("modal-cancel-btn");
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      if (onConfirm) {
+        cancelBtn.classList.remove("hidden");
+        confirmBtn.textContent = "Растау";
+        confirmBtn.onclick = () => {
+          closeModal();
+          onConfirm();
+        };
+      } else {
+        cancelBtn.classList.add("hidden");
+        confirmBtn.textContent = "Түсінікті";
+        confirmBtn.onclick = () => closeModal();
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("custom-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function resetProgressModal() {
+      showModal(
+        "Прогресті қалпына келтіру",
+        "Барлық өтілген сабақтардың нәтижелері мен тест ұпайлары өшіріледі. Жалғастыруды қалайсыз ба?",
+        () => {
+          appState.completedLessons = {};
+          appState.examResult = null;
+          appState.currentLessonIndex = 0;
+          appState.currentStep = 0;
+          appState.viewMode = "lesson";
+          saveState();
+          renderCurrentView();
+        }
+      );
+    }
+
+    // =========================================================================
+    // НАВИГАЦИЯ И РЕНДЕРИНГ САЙДБАРА
+    // =========================================================================
+    function updateSidebarUI() {
+      const navList = document.getElementById("lesson-nav-list");
+      let passedCount = 0;
+      let totalPoints = 0;
+
+      COURSE_LESSONS.forEach((l) => {
+        const res = appState.completedLessons[l.id];
+        if (res && res.passed) passedCount++;
+        if (res) totalPoints += res.score * 10;
+      });
+      if (appState.examResult) {
+        totalPoints += appState.examResult.score * 15;
+      }
+
+      const pct = Math.round((passedCount / COURSE_LESSONS.length) * 100);
+      document.getElementById("sidebar-progress-text").textContent = `${pct}% (${passedCount}/${COURSE_LESSONS.length})`;
+      document.getElementById("sidebar-progress-bar").style.width = `${pct}%`;
+      document.getElementById("sidebar-score").textContent = `${totalPoints} ұпай`;
+
+      navList.innerHTML = COURSE_LESSONS.map((lesson, idx) => {
+        const isCurrent = appState.viewMode === "lesson" && appState.currentLessonIndex === idx;
+        const status = appState.completedLessons[lesson.id];
+        const isPassed = status && status.passed;
+
+        return `
+          <button onclick="selectLesson(${idx})" class="w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-all ${
+            isCurrent
+              ? "bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-700/60 text-brand-900 dark:text-white shadow-2xs"
+              : "hover:bg-slate-100 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300 border border-transparent"
+          }">
+            <div class="w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold mt-0.5 ${
+              isPassed
+                ? "bg-emerald-500 text-white"
+                : isCurrent
+                  ? "bg-brand-600 text-white"
+                  : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+            }">
+              ${isPassed ? "✓" : lesson.id}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-semibold leading-snug line-clamp-2">${lesson.shortTitle}</div>
+              <div class="flex items-center gap-2 mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                <span>${lesson.duration}</span>
+                ${status ? `<span class="font-semibold ${isPassed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600"}">• Тест: ${status.score}/${status.total}</span>` : ""}
+              </div>
+            </div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function selectLesson(idx) {
+      appState.viewMode = "lesson";
+      appState.currentLessonIndex = idx;
+      appState.currentStep = 0;
+      toggleSidebar(false);
+      saveState();
+      renderCurrentView();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function switchStep(stepIdx) {
+      appState.viewMode = "lesson";
+      appState.currentStep = stepIdx;
+      saveState();
+      renderCurrentView();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function openExamView() {
+      appState.viewMode = "exam";
+      toggleSidebar(false);
+      renderCurrentView();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function navigatePrev() {
+      if (appState.viewMode === "exam") {
+        selectLesson(COURSE_LESSONS.length - 1);
+        return;
+      }
+      if (appState.currentStep > 0) {
+        switchStep(appState.currentStep - 1);
+      } else if (appState.currentLessonIndex > 0) {
+        appState.currentLessonIndex--;
+        appState.currentStep = 2;
+        saveState();
+        renderCurrentView();
+      }
+    }
+
+    function navigateNext() {
+      if (appState.viewMode === "exam") return;
+      if (appState.currentStep < 2) {
+        switchStep(appState.currentStep + 1);
+      } else if (appState.currentLessonIndex < COURSE_LESSONS.length - 1) {
+        selectLesson(appState.currentLessonIndex + 1);
+      } else {
+        openExamView();
+      }
+    }
+
+    // =========================================================================
+    // ОСНОВНОЙ РЕНДЕРИНГ УРОКА ИЛИ ЭКЗАМЕНА
+    // =========================================================================
+    function renderCurrentView() {
+      updateSidebarUI();
+      const main = document.getElementById("main-content");
+      const stepsBar = document.getElementById("lesson-steps-bar");
+      const footer = document.getElementById("lesson-footer");
+
+      if (appState.viewMode === "exam") {
+        stepsBar.classList.add("hidden");
+        document.getElementById("header-breadcrumb").textContent = "Қорытынды аттестаттау • Барлық 10 тақырып бойынша";
+        document.getElementById("header-lesson-title").textContent = "Қорытынды емтихан және Сертификат алу";
+        document.getElementById("btn-prev").disabled = false;
+        document.getElementById("btn-next").classList.add("hidden");
+        renderExamPage(main);
+        return;
+      }
+
+      stepsBar.classList.remove("hidden");
+      document.getElementById("btn-next").classList.remove("hidden");
+
+      const lesson = COURSE_LESSONS[appState.currentLessonIndex];
+      document.getElementById("header-breadcrumb").textContent = `Сабақ ${lesson.id} / ${COURSE_LESSONS.length} • Ұзақтығы: ${lesson.duration}`;
+      document.getElementById("header-lesson-title").textContent = lesson.title;
+
+      // Обновляем вкладки шагов
+      [0, 1, 2].forEach((i) => {
+        const tab = document.getElementById(`step-tab-${i}`);
+        const badge = tab.querySelector("span:first-child");
+        if (i === appState.currentStep) {
+          tab.className = "step-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-brand-600 text-white shadow-sm transition-all";
+          badge.className = "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold bg-white/20 text-white";
+        } else {
+          tab.className = "step-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all";
+          badge.className = "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300";
+        }
+      });
+
+      const statusObj = appState.completedLessons[lesson.id];
+      const statusBadge = document.getElementById("lesson-status-badge");
+      if (statusObj && statusObj.passed) {
+        statusBadge.className = "text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
+        statusBadge.textContent = `✓ Аяқталды (${statusObj.score}/${statusObj.total})`;
+      } else {
+        statusBadge.className = "text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300";
+        statusBadge.textContent = "Мәртебесі: Оқылуда";
+      }
+
+      // Настройка кнопок Вперед / Назад
+      document.getElementById("btn-prev").disabled = appState.currentLessonIndex === 0 && appState.currentStep === 0;
+      const nextBtnSpan = document.querySelector("#btn-next span");
+      if (appState.currentStep < 2) {
+        nextBtnSpan.textContent = "Келесі қадам";
+      } else if (appState.currentLessonIndex < COURSE_LESSONS.length - 1) {
+        nextBtnSpan.textContent = `Келесі сабақ (${lesson.id + 1})`;
+      } else {
+        nextBtnSpan.textContent = "Қорытынды емтиханға өту";
+      }
+
+      // Рендер содержимого шага
+      if (appState.currentStep === 0) {
+        main.innerHTML = `
+          <div class="mb-6">
+            <div class="inline-flex items-center gap-2 text-xs font-semibold text-brand-600 dark:text-brand-400 mb-1">
+              <span>1-ҚАДАМ</span> • <span>ДӘРІС КОНСПЕКТІСІ</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">${lesson.title}</h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5">${lesson.summary}</p>
+          </div>
+          ${lesson.theoryHTML}
+        `;
+      } else if (appState.currentStep === 1) {
+        main.innerHTML = `
+          <div class="mb-6">
+            <div class="inline-flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">
+              <span>2-ҚАДАМ</span> • <span>ИНТЕРАКТИВТІ СХЕМАЛАР МЕН САЛЫСТЫРМАЛЫ КЕСТЕЛЕР</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">${lesson.shortTitle} — Визуализация</h2>
+          </div>
+          ${lesson.interactiveHTML}
+        `;
+        initLessonInteractives(lesson.id);
+      } else if (appState.currentStep === 2) {
+        renderLessonQuiz(main, lesson);
+      }
+    }
+
+    // =========================================================================
+    // ИНТЕРАКТИВНЫЕ СИМУЛЯТОРЫ ВНУТРИ УРОКОВ
+    // =========================================================================
+    function initLessonInteractives(lessonId) {
+      if (lessonId === 1) updateCpuSim();
+      if (lessonId === 4) updateBufferSim();
+      if (lessonId === 9) convertUnits();
+      if (lessonId === 10) renderFarPanels();
+    }
+
+    // Урок 1: Симулятор CPU
+    function updateCpuSim() {
+      const freq = parseFloat(document.getElementById("cpu-freq-slider")?.value || 3.2);
+      const cores = parseInt(document.getElementById("cpu-cores-slider")?.value || 8);
+      const nmFactor = parseFloat(document.getElementById("cpu-nm-select")?.value || 0.82);
+
+      document.getElementById("cpu-freq-val").textContent = `${freq.toFixed(1)} ГГц`;
+      document.getElementById("cpu-cores-val").textContent = `${cores} ядро`;
+      const sel = document.getElementById("cpu-nm-select");
+      document.getElementById("cpu-nm-val").textContent = sel.options[sel.selectedIndex].text;
+
+      const perf = (freq * cores * 1.25).toFixed(1);
+      const tdp = Math.round(cores * Math.pow(freq, 1.85) * 1.15 * nmFactor);
+
+      document.getElementById("cpu-perf-out").textContent = `${perf} GOPS`;
+      document.getElementById("cpu-tdp-out").textContent = `${tdp} Вт`;
+
+      const advice = document.getElementById("cpu-cooling-advice");
+      if (tdp < 95) {
+        advice.className = "text-xs p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800";
+        advice.textContent = "Ұсынылатын салқындату: Стандартты ауа кулері жеткілікті. Энергия тиімді режим.";
+      } else if (tdp < 180) {
+        advice.className = "text-xs p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800";
+        advice.textContent = "Ұсынылатын салқындату: Жылу құбырлары бар мұнаралы кулер немесе 240 мм СЖО қажет.";
+      } else {
+        advice.className = "text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800";
+        advice.textContent = "Ескерту (Жоғары TDP!): 360 мм сұйықтықпен салқындату (СЖО) және DVFS жиілік шектеуі міндетті!";
+      }
+    }
+
+    // Урок 3: Подсветка шины SVG
+    function highlightBus(type) {
+      const d = document.getElementById("svg-bus-data");
+      const a = document.getElementById("svg-bus-addr");
+      const c = document.getElementById("svg-bus-ctrl");
+      const box = document.getElementById("bus-desc-box");
+
+      [d, a, c].forEach((el) => el.style.opacity = "0.2");
+
+      if (type === "all") {
+        [d, a, c].forEach((el) => el.style.opacity = "1");
+        box.textContent = "Барлық 3 шина бірге жүйелік магистральды құрайды: деректер, адрестер және басқару сигналдары синхронды жұмыс істейді.";
+      } else if (type === "data") {
+        d.style.opacity = "1";
+        box.textContent = "Деректер шинасы (Data Bus — көк түсті): Екі бағытты арна. CPU мен RAM/I/O арасында нақты ақпарат байттарын тасымалдайды.";
+      } else if (type === "addr") {
+        a.style.opacity = "1";
+        box.textContent = "Адрестік шина (Address Bus — жасыл түсті): Бір бағытты арна. Процессор қай жады ұяшығына немесе портқа жүгінетінін көрсетеді.";
+      } else if (type === "ctrl") {
+        c.style.opacity = "1";
+        box.textContent = "Басқару шинасы (Control Bus — сары түсті): Оқу (RD), Жазу (WR), Үзіліс (IRQ) және тактілік синхрондау командаларын береді.";
+      }
+    }
+
+    // Урок 4: Симулятор FIFO буфера
+    function updateBufferSim() {
+      const inRate = parseInt(document.getElementById("buf-in-slider").value);
+      const outRate = parseInt(document.getElementById("buf-out-slider").value);
+      const aiOpt = document.getElementById("buf-ai-opt").checked;
+
+      document.getElementById("buf-in-val").textContent = `${inRate} МБ/с`;
+      document.getElementById("buf-out-val").textContent = `${outRate} МБ/с`;
+
+      let ratio = (inRate / outRate) * 55;
+      if (aiOpt) ratio *= 0.72;
+      const pct = Math.min(100, Math.max(10, Math.round(ratio)));
+
+      const bar = document.getElementById("buf-fill-bar");
+      const label = document.getElementById("buf-pct-label");
+      const msg = document.getElementById("buf-status-msg");
+
+      label.textContent = `${pct}%`;
+      bar.style.width = `${pct}%`;
+
+      if (pct < 60) {
+        bar.className = "h-full rounded-full bg-emerald-500 transition-all duration-300";
+        msg.className = "text-xs mt-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800";
+        msg.textContent = "Қалыпты күй: Өңдеу жылдамдығы жеткілікті, FIFO буферінде кептеліс жоқ.";
+      } else if (pct < 90) {
+        bar.className = "h-full rounded-full bg-amber-500 transition-all duration-300";
+        msg.className = "text-xs mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800";
+        msg.textContent = "Орташа жүктеме: FIFO буфер пакеттерді уақытша сақтап, ағынды теңестіруде.";
+      } else {
+        bar.className = "h-full rounded-full bg-rose-600 transition-all duration-300";
+        msg.className = "text-xs mt-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800";
+        msg.textContent = "Buffer Overflow қаупі! Кіріс ағыны тым жоғары — ЖИ-оңтайландыруды қосыңыз немесе өңдеу жылдамдығын арттырыңыз.";
+      }
+    }
+
+    // Урок 5: Таймер 20-20-20
+    function startEyeTimer() {
+      clearInterval(eyeTimerInterval);
+      eyeSecondsLeft = 20;
+      const disp = document.getElementById("eye-timer-display");
+      const hint = document.getElementById("eye-timer-hint");
+      disp.textContent = "00:20";
+      hint.textContent = "Көзіңізді экраннан алып, 6 метр қашықтыққа қараңыз...";
+
+      eyeTimerInterval = setInterval(() => {
+        eyeSecondsLeft--;
+        disp.textContent = `00:${eyeSecondsLeft < 10 ? "0" : ""}${eyeSecondsLeft}`;
+        if (eyeSecondsLeft <= 0) {
+          clearInterval(eyeTimerInterval);
+          disp.textContent = "Дайын! ✓";
+          hint.textContent = "Керемет! Көз бұлшықеттері демалды, жұмысты жалғастыруға болады.";
+        }
+      }, 1000);
+    }
+
+    function resetEyeTimer() {
+      clearInterval(eyeTimerInterval);
+      eyeSecondsLeft = 20;
+      document.getElementById("eye-timer-display").textContent = "00:20";
+      document.getElementById("eye-timer-hint").textContent = "6 метр (20 фут) қашықтықтағы терезеге немесе алыс нүктеге қараңыз.";
+    }
+
+    // Урок 9: Конвертер единиц измерения информации
+    function convertUnits() {
+      const val = parseFloat(document.getElementById("unit-input-val").value) || 0;
+      const type = document.getElementById("unit-input-type").value;
+
+      const multMap = { KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3, TB: 1024 ** 4 };
+      const bytes = val * multMap[type];
+      const bits = bytes * 8;
+      const mib = bytes / (1024 ** 2);
+      const gib = bytes / (1024 ** 3);
+      const gbDecimal = bytes / (1000 ** 3);
+
+      const grid = document.getElementById("unit-results-grid");
+      grid.innerHTML = `
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <div class="text-[10px] text-slate-400">БИТ (Bits)</div>
+          <div class="font-bold text-slate-800 dark:text-white mt-0.5 truncate">${bits.toLocaleString()}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <div class="text-[10px] text-slate-400">БАЙТ (Bytes)</div>
+          <div class="font-bold text-slate-800 dark:text-white mt-0.5 truncate">${bytes.toLocaleString()}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <div class="text-[10px] text-slate-400">МЕБИБАЙТ (MiB, 1024)</div>
+          <div class="font-bold text-brand-600 dark:text-brand-400 mt-0.5 truncate">${mib.toFixed(2)} MiB</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <div class="text-[10px] text-slate-400">ОНДЫҚ ГБ (1000³)</div>
+          <div class="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">${gbDecimal.toFixed(3)} ГБ</div>
+        </div>
+      `;
+    }
+
+    // Урок 10: Эмулятор FAR Manager / Norton Commander
+    function setActivePanel(side) {
+      farState.activePanel = side;
+      farState.selectedIdx = 0;
+      renderFarPanels();
+    }
+
+    function selectFarItem(side, idx, event) {
+      event.stopPropagation();
+      farState.activePanel = side;
+      farState.selectedIdx = idx;
+      renderFarPanels();
+    }
+
+    function renderFarPanels() {
+      const leftPanel = document.getElementById("far-panel-left");
+      const rightPanel = document.getElementById("far-panel-right");
+      if (!leftPanel || !rightPanel) return;
+
+      leftPanel.className = `bg-[#000080] border-2 ${farState.activePanel === "left" ? "border-amber-300" : "border-cyan-800"} rounded-lg p-2.5 cursor-pointer`;
+      rightPanel.className = `bg-[#000080] border-2 ${farState.activePanel === "right" ? "border-amber-300" : "border-cyan-800"} rounded-lg p-2.5 cursor-pointer`;
+
+      const renderList = (files, side) => {
+        if (files.length === 0) return `<div class="text-cyan-400/60 italic py-4 text-center">[Бос каталог]</div>`;
+        return files.map((f, idx) => {
+          const isSel = farState.activePanel === side && farState.selectedIdx === idx;
+          return `
+            <div onclick="selectFarItem('${side}', ${idx}, event)" class="flex justify-between px-2 py-1 rounded-xs ${
+              isSel ? "bg-cyan-300 text-[#000080] font-bold" : f.type === "dir" ? "text-white font-bold hover:bg-blue-900" : "text-cyan-200 hover:bg-blue-900"
+            }">
+              <span class="truncate">${f.type === "dir" ? "[" + f.name + "]" : f.name}</span>
+              <span class="shrink-0 ml-2">${f.size}</span>
+            </div>
+          `;
+        }).join("");
+      };
+
+      document.getElementById("far-left-list").innerHTML = renderList(farState.leftFiles, "left");
+      document.getElementById("far-right-list").innerHTML = renderList(farState.rightFiles, "right");
+    }
+
+    function farAction(key) {
+      const sourceList = farState.activePanel === "left" ? farState.leftFiles : farState.rightFiles;
+      const targetList = farState.activePanel === "left" ? farState.rightFiles : farState.leftFiles;
+      const out = document.getElementById("far-console-output");
+
+      if (key === "F7") {
+        const folderName = `New_Folder_${sourceList.length + 1}`;
+        sourceList.push({ name: folderName, size: "<DIR>", type: "dir", desc: "F7 пернесі арқылы құрылған жаңа каталог." });
+        farState.selectedIdx = sourceList.length - 1;
+        out.textContent = `> [F7 MkDir]: "${folderName}" каталогы сәтті құрылды.`;
+        renderFarPanels();
+        return;
+      }
+
+      const item = sourceList[farState.selectedIdx];
+      if (!item) {
+        out.textContent = "> Қате: Әрекет орындау үшін файлды таңдаңыз.";
+        return;
+      }
+
+      if (key === "F3") {
+        out.textContent = `> [F3 View — ${item.name}]: ${item.desc}`;
+      } else if (key === "F4") {
+        out.textContent = `> [F4 Edit — ${item.name}]: Ішкі мәтіндік редакторда ашылды (Өлшемі: ${item.size}).`;
+      } else if (key === "F5") {
+        if (!targetList.some((x) => x.name === item.name)) {
+          targetList.push({ ...item });
+          out.textContent = `> [F5 Copy]: "${item.name}" екінші панельге сәтті көшірілді!`;
+        } else {
+          out.textContent = `> [F5 Copy]: "${item.name}" мақсатты панельде бұрыннан бар.`;
+        }
+        renderFarPanels();
+      } else if (key === "F6") {
+        sourceList.splice(farState.selectedIdx, 1);
+        targetList.push(item);
+        farState.selectedIdx = Math.max(0, farState.selectedIdx - 1);
+        out.textContent = `> [F6 Move]: "${item.name}" екінші панельге жылжытылды!`;
+        renderFarPanels();
+      } else if (key === "F8") {
+        sourceList.splice(farState.selectedIdx, 1);
+        farState.selectedIdx = Math.max(0, farState.selectedIdx - 1);
+        out.textContent = `> [F8 Delete]: "${item.name}" жойылды.`;
+        renderFarPanels();
+      }
+    }
+
+    // =========================================================================
+    // ТЕСТЫ ПО КАЖДОМУ УРОКУ (STEP 3)
+    // =========================================================================
+    function renderLessonQuiz(container, lesson) {
+      const saved = appState.completedLessons[lesson.id];
+
+      let html = `
+        <div class="mb-6">
+          <div class="inline-flex items-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1">
+            <span>3-ҚАДАМ</span> • <span>ӨЗІН-ӨЗІ ТЕКСЕРУ ТЕСТІ (${lesson.quiz.length} СҰРАҚ)</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">${lesson.shortTitle} — Бекіту тесті</h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Сабақты сәтті аяқтау үшін сұрақтардың кемінде 60%-ына дұрыс жауап беріңіз.</p>
+        </div>
+        <form id="lesson-quiz-form" onsubmit="submitLessonQuiz(event, ${lesson.id})" class="space-y-5">
+      `;
+
+      lesson.quiz.forEach((item, qIdx) => {
+        const userAns = saved?.answers?.[qIdx];
+        html += `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs">
+            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white mb-3">
+              ${qIdx + 1}. ${item.q}
+            </div>
+            <div class="space-y-2">
+              ${item.options.map((opt, oIdx) => {
+                const isChecked = userAns === oIdx ? "checked" : "";
+                let extraStyle = "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/70";
+                if (saved) {
+                  if (oIdx === item.correct) {
+                    extraStyle = "border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-semibold";
+                  } else if (userAns === oIdx && oIdx !== item.correct) {
+                    extraStyle = "border-rose-500 bg-rose-50/80 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200";
+                  }
+                }
+                return `
+                  <label class="flex items-center gap-3 p-3 rounded-xl border ${extraStyle} cursor-pointer transition-colors text-xs sm:text-sm">
+                    <input type="radio" name="q_${qIdx}" value="${oIdx}" ${isChecked} class="accent-brand-600 w-4 h-4 shrink-0">
+                    <span>${opt}</span>
+                  </label>
+                `;
+              }).join("")}
+            </div>
+            ${saved ? `
+              <div class="mt-3 p-3 rounded-xl text-xs ${
+                userAns === item.correct
+                  ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800"
+                  : "bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800"
+              }">
+                <strong>Түсіндірме:</strong> ${item.explanation}
+              </div>
+            ` : ""}
+          </div>
+        `;
+      });
+
+      html += `
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <button type="submit" class="px-6 py-3 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all">
+              Жауаптарды тексеру
+            </button>
+            ${saved ? `
+              <div class="text-sm font-bold px-4 py-2.5 rounded-xl ${
+                saved.passed
+                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200"
+                  : "bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200"
+              }">
+                Нәтиже: ${saved.score} / ${saved.total} (${Math.round((saved.score / saved.total) * 100)}%) — ${saved.passed ? "Сабақ сәтті өтілді! ✓" : "Қайта тапсырып көріңіз"}
+              </div>
+            ` : ""}
+          </div>
+        </form>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function submitLessonQuiz(event, lessonId) {
+      event.preventDefault();
+      const lesson = COURSE_LESSONS.find((l) => l.id === lessonId);
+      const formData = new FormData(event.target);
+
+      let score = 0;
+      const answers = {};
+      let unanswered = 0;
+
+      lesson.quiz.forEach((item, idx) => {
+        const val = formData.get(`q_${idx}`);
+        if (val === null) {
+          unanswered++;
+        } else {
+          const num = parseInt(val);
+          answers[idx] = num;
+          if (num === item.correct) score++;
+        }
+      });
+
+      if (unanswered > 0) {
+        showModal("Барлық сұрақтарға жауап беріңіз", `Сіз әлі ${unanswered} сұраққа жауап таңдамадыңыз.`);
+        return;
+      }
+
+      const passed = score / lesson.quiz.length >= 0.6;
+      appState.completedLessons[lessonId] = {
+        score,
+        total: lesson.quiz.length,
+        passed,
+        answers
+      };
+
+      saveState();
+      renderCurrentView();
+    }
+
+    // =========================================================================
+    // ИТОГОВЫЙ ЭКЗАМЕН И ГЕНЕРАЦИЯ ИМЕННОГО СЕРТИФИКАТА
+    // =========================================================================
+    function renderExamPage(container) {
+      const res = appState.examResult;
+
+      let html = `
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-brand-600 to-indigo-700 text-white rounded-2xl p-6 shadow-lg">
+            <h2 class="text-xl sm:text-2xl font-extrabold mb-2">Қорытынды емтихан және Атаулы Сертификат</h2>
+            <p class="text-xs sm:text-sm text-indigo-100 leading-relaxed">
+              Курстың барлық 10 сабағы бойынша 15 сұраққа жауап беріңіз. <strong>70% (11/15)</strong> және одан жоғары нәтиже жинасаңыз, авторлық курс сертификатын жүктеп алуға немесе басып шығаруға болады.
+            </p>
+          </div>
+      `;
+
+      if (res && res.passed) {
+        const today = new Date().toLocaleDateString("kk-KZ");
+        const studentName = res.studentName || "Студент Аты-Жөні";
+        html += `
+          <!-- Блок генерации и печати сертификата -->
+          <div class="bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 rounded-2xl p-6 shadow-md">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+              <div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200 mb-1">
+                  Құттықтаймыз! Емтихан сәтті тапсырылды (${res.score}/${res.total} — ${Math.round((res.score/res.total)*100)}%)
+                </span>
+                <h3 class="text-lg font-bold">Атаулы сертификатты рәсімдеу</h3>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <input type="text" id="cert-name-input" value="${studentName}" oninput="updateCertName(this.value)" placeholder="Аты-жөніңізді енгізіңіз" class="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold">
+                <button onclick="window.print()" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-sm">
+                  Басып шығару / PDF сақтау
+                </button>
+              </div>
+            </div>
+
+            <!-- Визуальный бланк сертификата -->
+            <div id="certificate-printable" class="relative overflow-hidden rounded-2xl border-8 border-double border-indigo-900/80 bg-gradient-to-br from-white via-indigo-50/40 to-amber-50/40 text-slate-900 p-8 sm:p-12 text-center shadow-inner">
+              <div class="text-xs font-bold tracking-[0.25em] uppercase text-indigo-700 mb-2">
+                ҚАЗАҚСТАН РЕСПУБЛИКАСЫ • БІЛІМ БЕРУ БАҒДАРЛАМАСЫ
+              </div>
+              <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 my-3">
+                СЕРТИФИКАТ
+              </h1>
+              <p class="text-sm text-slate-600 mb-4">Осы сертификат</p>
+              <div id="cert-display-name" class="text-2xl sm:text-3xl font-extrabold text-indigo-900 border-b-2 border-indigo-300 inline-block px-8 pb-1 mb-5">
+                ${studentName}
+              </div>
+              <p class="text-sm sm:text-base text-slate-700 max-w-2xl mx-auto leading-relaxed mb-6">
+                «<strong>Компьютер архитектурасы, микропроцессорлар және операциялық жүйелер</strong>» пәні бойынша 10 дәрістік интерактивті онлайн-курсты толық меңгеріп, қорытынды емтиханды <strong>${Math.round((res.score/res.total)*100)}%</strong> нәтижемен сәтті аяқтағанын растайды.
+              </p>
+              <div class="flex flex-wrap items-end justify-between gap-6 pt-6 border-t border-slate-300/80 text-xs text-slate-700 max-w-2xl mx-auto">
+                <div class="text-left">
+                  <div class="font-bold text-slate-900">Курс авторы және лектор:</div>
+                  <div>Э.ғ.к., доцент Сарсенбиева Н.Ф.</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-16 h-16 rounded-full border-2 border-indigo-700 flex items-center justify-center font-extrabold text-indigo-800 text-[10px] mx-auto">
+                    VERIFIED<br>LMS 2026
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-slate-900">Берілген күні:</div>
+                  <div>${today}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      html += `<form id="final-exam-form" onsubmit="submitFinalExam(event)" class="space-y-4">`;
+      FINAL_EXAM_QUESTIONS.forEach((item, idx) => {
+        const userAns = res?.answers?.[idx];
+        html += `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+            <div class="font-bold text-sm text-slate-900 dark:text-white mb-3">${item.q}</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              ${item.options.map((opt, oIdx) => {
+                const isChecked = userAns === oIdx ? "checked" : "";
+                let style = "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800";
+                if (res) {
+                  if (oIdx === item.correct) style = "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 font-semibold";
+                  else if (userAns === oIdx) style = "border-rose-500 bg-rose-50 dark:bg-rose-950/40";
+                }
+                return `
+                  <label class="flex items-center gap-2.5 p-3 rounded-xl border ${style} cursor-pointer text-xs sm:text-sm">
+                    <input type="radio" name="eq_${idx}" value="${oIdx}" ${isChecked} class="accent-brand-600">
+                    <span>${opt}</span>
+                  </label>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <button type="submit" class="px-6 py-3 rounded-xl text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-md">
+              Қорытынды емтиханды аяқтау
+            </button>
+            ${res && !res.passed ? `
+              <div class="text-sm font-bold text-rose-600 dark:text-rose-400">
+                Нәтиже: ${res.score}/${res.total} (${Math.round((res.score/res.total)*100)}%). Сертификат үшін кемінде 70% (11 дұрыс жауап) қажет.
+              </div>
+            ` : ""}
+          </div>
+        </form>
+      </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function submitFinalExam(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      let score = 0;
+      let unanswered = 0;
+      const answers = {};
+
+      FINAL_EXAM_QUESTIONS.forEach((item, idx) => {
+        const val = formData.get(`eq_${idx}`);
+        if (val === null) {
+          unanswered++;
+        } else {
+          const num = parseInt(val);
+          answers[idx] = num;
+          if (num === item.correct) score++;
+        }
+      });
+
+      if (unanswered > 0) {
+        showModal("Аяқталмаған сұрақтар", `Емтиханды аяқтау үшін қалған ${unanswered} сұраққа жауап беріңіз.`);
+        return;
+      }
+
+      const passed = score / FINAL_EXAM_QUESTIONS.length >= 0.7;
+      appState.examResult = {
+        score,
+        total: FINAL_EXAM_QUESTIONS.length,
+        passed,
+        answers,
+        studentName: appState.examResult?.studentName || ""
+      };
+
+      saveState();
+      renderCurrentView();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateCertName(name) {
+      if (appState.examResult) {
+        appState.examResult.studentName = name;
+        saveState();
+      }
+      const el = document.getElementById("cert-display-name");
+      if (el) el.textContent = name || "Студент Аты-Жөні";
+    }
+
+    // Инициализация приложения при загрузке страницы
+    window.onload = function () {
+      loadState();
+      renderCurrentView();
+    };
+  </script>
+</body>
+</html>
